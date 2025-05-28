@@ -177,3 +177,4 @@ images/*.png
 DigiCertGlobalRootCA.crt.pem
 .env
 .env.solace.cloud
+output/report.txt

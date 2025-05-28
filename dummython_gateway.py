@@ -204,8 +204,8 @@ class SOAPRequestHandler(BaseHTTPRequestHandler):
 
         # NOTE: conversationid now contains combined value of {plant_id}/{building_id}/{machine_id}
         topic = (
-            f"{APP_TOPIC}/json/v1/xxx/"
-            f"{cpaid}/{conversationid}/{service}/{action}/"
+            f"{APP_TOPIC}/json/v1/"
+            f"{conversationid}/{cpaid}/{service}/{action}/"
             f"{dust}/{sticky}/{odor}/{cleaning}"
         )        
         topic_dest = Topic.of(topic)

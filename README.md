@@ -87,7 +87,7 @@ Now open the Solace PubSub+ Event Broker management console at http://localhost:
 3. In a second terminal run the gateway with `python3 dummython_gateway.py`. Don't forget to `source .env` first. Will output something like:
 
 ```
-ython3 dummython_gateway.py
+python3 dummython_gateway.py
 2025-05-25 16:57:39,813 [WARNING] solace.messaging.core: [_solace_transport.py:89]  [[SERVICE: 0x106f674a0] - [APP ID: ezSolace.local/39041/00000001/lXtQyrHEbm]] {'caller_description': 'From service event callback', 'return_code': 'Ok', 'sub_code': 'SOLCLIENT_SUBCODE_COMMUNICATION_ERROR', 'error_info_sub_code': 14, 'error_info_contents': 'TCP connection failure for fd 8, error = Connection refused (61)'}
 [2025-05-25 16:57:39] Connect to Solace broker...
 [2025-05-25 16:57:39] Pubsliher started...
