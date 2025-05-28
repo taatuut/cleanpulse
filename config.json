@@ -1,0 +1,18 @@
+{
+    "app": {
+        "name": "dummython",
+        "url": "http://localhost:54321",
+        "dummy_url": "http://example.com/dummython-endpoint",
+        "queue": "CUSTOM-QNAME-dummython",
+        "topic": "dummython/messages",
+        "subscription": "dummython/messages/>",
+        "debug": true,
+        "log_level": "info"
+    },
+    "database": {
+        "host": "127.0.0.1",
+        "port": 5432,
+        "user": "admin",
+        "password": "admin"
+    }
+}
