@@ -13,9 +13,10 @@ Components:
 	* Sensors on Machines: Each machine is equipped with sensors that generate events related to cleaning activities (e.g., start time, end time, water usage, energy consumption).
 	* Event Broker: These events are published to the Solace Event Broker.
 	* Micro Integration: some events need to have an intermediary component to do protocol bridging for instance, and MI are perfect fit
-* Data Storage and Analytics:
-	* Database:  events are stored in a database for historical analysis and reporting.
-	* Analytics Engine/Solace Agent Mesh: An analytics engine can be used to generate insights and reports on cleaning activities, such as trends in water and energy usage, frequency of cleanings, and compliance with cleaning schedules.
+* Data Storage:
+	* Database:  events are stored in a sqlite and neo4j database for historical analysis and reporting.
+* Analytics: An analytics engine can be used to generate insights and reports on cleaning activities, such as trends in water and energy usage, frequency of cleanings, and compliance with cleaning schedules.
+On the data in sqlite IsolationForest analysis is run periodically to detect outliers. In neo4j relations are created between the individual events showing the overall patterns and phenomenons.
 
 ## steps- concept, please add/change
 - create application description and use ai event model wizard to create app with events
@@ -29,12 +30,15 @@ Components:
 ![hitech industrial control room with multiple digital dashboards showing live data feeds featuring real-time cleaning activities](https://github.com/user-attachments/assets/f9e7a312-6471-4631-a278-fd53e49e5218)
 
 ## Context
-This demo is developed for Solace SKO FY26 on Mac OS using Python (3.10.6+) and Colimna. Some terminal commands need to be adjusted to run on Linux or Windows. 
+This demo is developed for Solace SKO FY26 on macOS using Python (3.10.6+) and Colimna. Some terminal commands need to be adjusted to run on Linux or Windows. 
 
 ## Repo
 `git clone https://github.com/taatuut/<todo>.git`
 
 ## Setup
+
+### Python
+
 Create and source a Python virtual environment, this demo use `~/.venv`.
 
 Open a terminal and run:
@@ -50,6 +54,83 @@ Install Python modules (optional: `upgrade pip`)
 ```
 python3 -m pip install --upgrade pip
 python3 -m pip install requests lxml solace-pubsubplus pyyaml pandas scikit-learn neo4j
+```
+
+### Neo4j
+Install Neo4j using `brew install neo4j`, this icnludes `cypher-shell` cli for neo4j and `openjdk@21`, see Appendix Neo4j.
+
+To get a services overview use `brew services list`. Depending on services installed and their status it will show something like:
+
+```bash
+Name              Status  User       File
+dbus              none               
+docker-machine    none    emilzegers 
+mongodb-community started emilzegers ~/Library/LaunchAgents/homebrew.mxcl.mongodb-community.plist
+neo4j             started emilzegers ~/Library/LaunchAgents/homebrew.mxcl.neo4j.plist
+php               none               
+podman            none               
+postgresql@14     none               
+unbound           none               
+viam-server       none    
+```
+
+To (re)start with a clean database delete all nodes and relations run a cypher query in the Neo4j browser or use `cypher-shell` commands (see `PrepareEnvironment.sh`).
+
+```sql
+MATCH (n)
+DETACH DELETE n
+```
+
+NOTE: could run Neo4j in a container to make this a system independent component.
+
+### Sample data
+File `./data/saml/SAML-D.zip` from https://www.kaggle.com/datasets/berkanoztas/synthetic-transaction-monitoring-dataset-aml
+
+## Run
+Make sure shell scripts are executable
+
+```bash
+chmod +x **/*.sh
+```
+
+In first terminal clean and prepare environment run:
+
+```bash
+./PrepareEnvironment.sh
+```
+
+Responds with something like:
+
+```bash
+{ ok: 1, dropped: 'bank' }
+{ ok: 1, dropped: 'bank' }
+0 rows
+ready to start consuming query after 348 ms, results consumed after another 0 ms
+Deleted 1359 nodes, Deleted 2858 relationships
++----------------------------------------------------+
+| value                                              |
++----------------------------------------------------+
+| "Query caches successfully cleared of 11 queries." |
++----------------------------------------------------+
+
+1 row
+ready to start consuming query after 46 ms, results consumed after another 123 ms
+0 rows
+ready to start consuming query after 30 ms, results consumed after another 0 ms
++---------------------------------------------------+
+| value                                             |
++---------------------------------------------------+
+| "Query caches successfully cleared of 3 queries." |
++---------------------------------------------------+
+
+1 row
+ready to start consuming query after 18 ms, results consumed after another 3 ms
+0 rows
+ready to start consuming query after 28 ms, results consumed after another 0 ms
+0 rows
+ready to start consuming query after 9 ms, results consumed after another 0 ms
+remove transactions
+remove output
 ```
 
 ## Set environment variables
@@ -88,10 +169,13 @@ Now open the Solace PubSub+ Event Broker management console at http://localhost:
 
 ```
 python3 dummython_gateway.py
-2025-05-25 16:57:39,813 [WARNING] solace.messaging.core: [_solace_transport.py:89]  [[SERVICE: 0x106f674a0] - [APP ID: ezSolace.local/39041/00000001/lXtQyrHEbm]] {'caller_description': 'From service event callback', 'return_code': 'Ok', 'sub_code': 'SOLCLIENT_SUBCODE_COMMUNICATION_ERROR', 'error_info_sub_code': 14, 'error_info_contents': 'TCP connection failure for fd 8, error = Connection refused (61)'}
-[2025-05-25 16:57:39] Connect to Solace broker...
-[2025-05-25 16:57:39] Pubsliher started...
-[2025-05-25 16:57:42] Starting HTTP server on port 54321...
+[2025-06-03 09:54:39] Connect to Solace broker...
+[2025-06-03 09:54:39] 
+[2025-06-03 09:54:39] Pubsliher started...
+[2025-06-03 09:54:39] 
+[2025-06-03 09:54:39] - SQLite database running in memory
+[2025-06-03 09:54:39] - Neo4j database running at neo4j://localhost:7687, Neo4j Browser at http://localhost:7474/
+[2025-06-03 09:54:39] HTTP server on port 54321 started
 ```
 
 4. Open a third terminal to send messages from. Make sure environment variables are available by running `source .env` and virtual environment is activated (run `source ~/.venv/bin/activate`). The messages are sent in two ways:
@@ -309,3 +393,64 @@ CONTAINER ID   IMAGE                           COMMAND               CREATED    
 a3663a4e4cd3   solace/solace-pubsub-standard   "/usr/sbin/boot.sh"   16 minutes ago   Up 16 minutes   0.0.0.0:1883->1883/tcp, :::1883->1883/tcp, 0.0.0.0:2222->2222/tcp, :::2222->2222/tcp, 0.0.0.0:5672->5672/tcp, :::5672->5672/tcp, 0.0.0.0:8000->8000/tcp, :::8000->8000/tcp, 0.0.0.0:8008->8008/tcp, :::8008->8008/tcp, 0.0.0.0:8080->8080/tcp, :::8080->8080/tcp, 0.0.0.0:9000->9000/tcp, :::9000->9000/tcp, 0.0.0.0:55554->55555/tcp, [::]:55554->55555/tcp   dummython
 ```
 
+### Appendix Neo4j
+`brew install neo4j`
+
+```
+Warning: Treating neo4j as a formula. For the cask, use homebrew/cask/neo4j or specify the `--cask` flag. To silence this message, use the `--formula` flag.
+==> Downloading https://ghcr.io/v2/homebrew/core/neo4j/manifests/5.26.1
+################################################################################# 100.0%
+==> Fetching dependencies for neo4j: openjdk@21 and cypher-shell
+==> Downloading https://ghcr.io/v2/homebrew/core/openjdk/21/manifests/21.0.6
+################################################################################# 100.0%
+==> Fetching openjdk@21
+==> Downloading https://ghcr.io/v2/homebrew/core/openjdk/21/blobs/sha256:da5c2f7119b6dc7
+################################################################################# 100.0%
+==> Downloading https://ghcr.io/v2/homebrew/core/cypher-shell/manifests/5.26.1
+################################################################################# 100.0%
+==> Fetching cypher-shell
+==> Downloading https://ghcr.io/v2/homebrew/core/cypher-shell/blobs/sha256:62db759c9156b
+################################################################################# 100.0%
+==> Fetching neo4j
+==> Downloading https://ghcr.io/v2/homebrew/core/neo4j/blobs/sha256:9bcb547a5e20e39a5630
+################################################################################# 100.0%
+==> Installing dependencies for neo4j: openjdk@21 and cypher-shell
+==> Installing neo4j dependency: openjdk@21
+==> Downloading https://ghcr.io/v2/homebrew/core/openjdk/21/manifests/21.0.6
+Already downloaded: /Users/emilzegers/Library/Caches/Homebrew/downloads/654d2d4f777dded9fa34075a3f8513ca3dc52c6cead784ee770c057595cd8b55--openjdk@21-21.0.6.bottle_manifest.json
+==> Pouring openjdk@21--21.0.6.sonoma.bottle.tar.gz
+🍺  /usr/local/Cellar/openjdk@21/21.0.6: 600 files, 329.3MB
+==> Installing neo4j dependency: cypher-shell
+==> Downloading https://ghcr.io/v2/homebrew/core/cypher-shell/manifests/5.26.1
+Already downloaded: /Users/emilzegers/Library/Caches/Homebrew/downloads/01b631ec4d7d62b1775289aebe610d1cd05ac2b8b9af85615fcb3f759232e2bf--cypher-shell-5.26.1.bottle_manifest.json
+==> Pouring cypher-shell--5.26.1.all.bottle.tar.gz
+🍺  /usr/local/Cellar/cypher-shell/5.26.1: 61 files, 42.2MB
+==> Installing neo4j
+==> Pouring neo4j--5.26.1.all.bottle.tar.gz
+==> Caveats
+To start neo4j now and restart at login:
+  brew services start neo4j
+Or, if you don't want/need a background service you can just run:
+  /usr/local/opt/neo4j/bin/neo4j console
+==> Summary
+🍺  /usr/local/Cellar/neo4j/5.26.1: 275 files, 163.4MB
+==> Running `brew cleanup neo4j`...
+Disable this behaviour by setting HOMEBREW_NO_INSTALL_CLEANUP.
+Hide these hints with HOMEBREW_NO_ENV_HINTS (see `man brew`).
+==> Caveats
+==> neo4j
+To start neo4j now and restart at login:
+  brew services start neo4j
+Or, if you don't want/need a background service you can just run:
+  /usr/local/opt/neo4j/bin/neo4j console
+```
+
+```
+brew services start neo4j
+
+==> Successfully started `neo4j` (label: homebrew.mxcl.neo4j)
+```
+
+Much change default user:pass `neo4j:neo4j` first. Go to http://localhost:7474/browser/
+
+To install just `cypher-shell` on a machine use `brew install cypher-shell`

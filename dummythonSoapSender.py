@@ -100,17 +100,18 @@ def main():
     response = send_message(APP_URL, soap_message, machine_id)    
     print()
     if response:
-        print(f"SOAP request sent to gateway {APP_URL}")
+        print(f"SOAP request sent to Gateway {APP_URL}")
         print("Gateway Response:")
         print(f"Status Code: {response.status_code}")
         print(f"Response headers: {response.headers}")
         print(f"Response text: {response.text}")
     else:
         print("Failed to send SOAP message to gateway.")
-    response = send_message(f"{SOLACE_REST_URL}/{APP_TOPIC}/xml/v1/", soap_message, machine_id)
+    url = f"{SOLACE_REST_URL}/{APP_TOPIC}/xml/v1/{plant_id}/{building_id}/{machine_id}"
+    response = send_message(url, soap_message, machine_id)
     print()
     if response:
-        print(f"REST request sent to Solace broker {SOLACE_REST_URL}/{APP_TOPIC}/xml/v1/")
+        print(f"REST request sent to Solace broker {url}")
         print("Broker Response:")
         print(f"Status Code: {response.status_code}")
         print(f"Response headers: {response.headers}")
