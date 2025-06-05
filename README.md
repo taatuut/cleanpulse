@@ -1,5 +1,5 @@
-# cleanpulse
-"Real-time insights for spotless performance". an application that focuses on reporting the cleaning activities of machines in a factory, including details such as the last cleaning time, duration, water usage, and energy usage. Relevant for CPG, like beer breweries and coffee-roasting factories.
+# clean clean, always clean
+"Real-time insights for spotless performance". An application that focuses on reporting the cleaning activities of machines in a factory, including details such as the last cleaning time, duration, water usage, and energy usage. Relevant for CPG industry, like beer breweries and coffee-roasting factories.
 
 ## what we are aiming for
 Real-time information into a high-tech industrial control room with multiple digital dashboards showing live data feeds. One dashboard highlights real-time cleaning activities of robotic and automated machines in a brewery and factory. Screens display animated timelines, sensor graphs, heatmaps of machine cleanliness, and event logs. Overlaid holographic UI elements show Solace PubSub+ messaging icons, AI analytics charts, and alerts. In the background, factory floors and brewing tanks are visible through glass walls, with autonomous cleaning robots in action. "Powered by CleanPulse AI".
@@ -83,9 +83,6 @@ DETACH DELETE n
 
 NOTE: could run Neo4j in a container to make this a system independent component.
 
-### Sample data
-File `./data/saml/SAML-D.zip` from https://www.kaggle.com/datasets/berkanoztas/synthetic-transaction-monitoring-dataset-aml
-
 ## Run
 Make sure shell scripts are executable
 
@@ -102,35 +99,41 @@ In first terminal clean and prepare environment run:
 Responds with something like:
 
 ```bash
-{ ok: 1, dropped: 'bank' }
-{ ok: 1, dropped: 'bank' }
 0 rows
-ready to start consuming query after 348 ms, results consumed after another 0 ms
-Deleted 1359 nodes, Deleted 2858 relationships
+ready to start consuming query after 64 ms, results consumed after another 0 ms
+Deleted 2495 nodes, Deleted 8186 relationships
 +----------------------------------------------------+
 | value                                              |
 +----------------------------------------------------+
-| "Query caches successfully cleared of 11 queries." |
+| "Query caches successfully cleared of 15 queries." |
 +----------------------------------------------------+
 
 1 row
-ready to start consuming query after 46 ms, results consumed after another 123 ms
+ready to start consuming query after 12 ms, results consumed after another 2 ms
 0 rows
-ready to start consuming query after 30 ms, results consumed after another 0 ms
-+---------------------------------------------------+
-| value                                             |
-+---------------------------------------------------+
-| "Query caches successfully cleared of 3 queries." |
-+---------------------------------------------------+
+ready to start consuming query after 8 ms, results consumed after another 0 ms
+0 rows
+ready to start consuming query after 6 ms, results consumed after another 0 ms
+removed transactions files
+removed output files
+(.venv) emilzegers@ezSolace cleanpulse % ./PrepareEnvironment.sh
+0 rows
+ready to start consuming query after 74 ms, results consumed after another 0 ms
+Deleted 604 nodes, Deleted 1886 relationships
++----------------------------------------------------+
+| value                                              |
++----------------------------------------------------+
+| "Query caches successfully cleared of 14 queries." |
++----------------------------------------------------+
 
 1 row
-ready to start consuming query after 18 ms, results consumed after another 3 ms
+ready to start consuming query after 22 ms, results consumed after another 3 ms
 0 rows
-ready to start consuming query after 28 ms, results consumed after another 0 ms
+ready to start consuming query after 5 ms, results consumed after another 0 ms
 0 rows
-ready to start consuming query after 9 ms, results consumed after another 0 ms
-remove transactions
-remove output
+ready to start consuming query after 3 ms, results consumed after another 1 ms
+removed transactions files
+removed output files
 ```
 
 ## Set environment variables
