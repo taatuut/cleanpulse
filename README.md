@@ -33,7 +33,7 @@ On the data in sqlite IsolationForest analysis is run periodically to detect out
 This demo is developed for Solace SKO FY26 on macOS using Python (3.10.6+) and Colimna. Some terminal commands need to be adjusted to run on Linux or Windows. 
 
 ## Repo
-`git clone https://github.com/taatuut/<todo>.git`
+`git clone https://github.com/taatuut/cleanpulse.git`
 
 ## Setup
 
@@ -114,24 +114,6 @@ ready to start consuming query after 12 ms, results consumed after another 2 ms
 ready to start consuming query after 8 ms, results consumed after another 0 ms
 0 rows
 ready to start consuming query after 6 ms, results consumed after another 0 ms
-removed transactions files
-removed output files
-(.venv) emilzegers@ezSolace cleanpulse % ./PrepareEnvironment.sh
-0 rows
-ready to start consuming query after 74 ms, results consumed after another 0 ms
-Deleted 604 nodes, Deleted 1886 relationships
-+----------------------------------------------------+
-| value                                              |
-+----------------------------------------------------+
-| "Query caches successfully cleared of 14 queries." |
-+----------------------------------------------------+
-
-1 row
-ready to start consuming query after 22 ms, results consumed after another 3 ms
-0 rows
-ready to start consuming query after 5 ms, results consumed after another 0 ms
-0 rows
-ready to start consuming query after 3 ms, results consumed after another 1 ms
 removed transactions files
 removed output files
 ```
