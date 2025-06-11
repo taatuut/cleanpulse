@@ -80,9 +80,10 @@ def send_message(url, message, machine_id):
     return None
 
 def main():
-    plant_id = 'plant' + str(random.randint(1, 5))
-    building_id = 'building' + str(random.randint(1, 20))
-    machine_id = 'machine' + str(random.randint(1, 10))
+    # TODO: get ranges from config.json
+    plant_id = 'plant' + str(random.randint(1, 3)) # 1-5
+    building_id = 'building' + str(random.randint(1, 2)) # 1-20
+    machine_id = 'machine' + str(random.randint(1, 4)) # 1-10
     d={'low':20,'moderate':80,'high':120}
     s={'minimal':30,'present':70,'excessive':110}
     o={'normal':10,'noticeable':60,'strong':100}
@@ -135,7 +136,7 @@ if __name__ == "__main__":
 
     http_protocol = 'https://' if SOLACE_REST_PORT[-2:] == '43' else 'http://'
 
-    userpass = '' if http_protocol == 'http://' else f"{SOLACE_CLIENT_USER}:{SOLACE_CLIENT_PASS}@" # TODO: sloppy... todo: proper check/setup
+    userpass = '' if http_protocol == 'http://' else f"{SOLACE_CLIENT_USER}:{SOLACE_CLIENT_PASS}@" # TODO: sloppy... replace with proper check/setup (as in other repo)
 
     # Solace REST API URL
     SOLACE_REST_URL = f"{http_protocol}{userpass}{SOLACE_HOST}:{SOLACE_REST_PORT}"

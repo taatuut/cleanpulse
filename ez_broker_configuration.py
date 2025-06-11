@@ -4,19 +4,19 @@ import json
 # ez
 from ez_config_loader import ConfigLoader
 
-def queue_exists():
+def queue_exists(baseurl,queuename,auth):
     """Check if the queue already exists in the VPN."""
-    response = requests.get(f"{BASE_URL}/queues/{QUEUE_NAME}", auth=AUTH)
+    response = requests.get(f"{baseurl}/queues/{queuename}", auth=auth)
     return response.status_code == 200
 
-def create_queue():
+def create_queue(queuename,clientuser):
     """Create the queue if it does not exist."""
     # See https://docs.solace.com/Cloud/Event-Portal/event-portal-runtime-config.htm for Queue Configuration Properties
     data = {
-        "queueName": QUEUE_NAME,
+        "queueName": queuename,
         "accessType": "non-exclusive",
     	"maxMsgSpoolUsage": 15000,
-        "owner": SOLACE_CLIENT_USER,
+        "owner": clientuser,
         "egressEnabled": True,
         "ingressEnabled": True
     }
@@ -39,7 +39,7 @@ def subscription_exists():
     
     return False
 
-def add_subscription():
+def add_subscription(topicsubscription,baseurl,queuename,headers,auth):
     """Add the topic subscription to the queue."""
     data = {"subscriptionTopic": TOPIC_SUBSCRIPTION}
     response = requests.post(f"{BASE_URL}/queues/{QUEUE_NAME}/subscriptions", headers=HEADERS, auth=AUTH, json=data)
@@ -54,8 +54,7 @@ if __name__ == "__main__":
     # Load values from the configuration
     config = ConfigLoader("config.json")
     # Queue and Subscription Details
-    QUEUE_NAME = config.get("app.queue")
-    TOPIC_SUBSCRIPTION = config.get("app.subscription")
+    QUEUES_SUBSCRIPTIONS = config.get("app.queues")
     # Only print, write etc in debug modus, using config variable
     APP_DEBUG = config.get("app.debug")
     
@@ -81,16 +80,21 @@ if __name__ == "__main__":
     # Authentication Tuple
     AUTH = (SOLACE_USER, SOLACE_PASS)
 
-    if not queue_exists():
-        print(f"Queue '{QUEUE_NAME}' does not exist. Creating...")
-        if create_queue():
-            add_subscription()
-    else:
-        print(f"Queue '{QUEUE_NAME}' already exists.")
-        if not subscription_exists():
-            print(f"Adding missing subscription '{TOPIC_SUBSCRIPTION}'...")
-            add_subscription()
+    for queue in QUEUES_SUBSCRIPTIONS:
+        QUEUE_NAME = queue["name"]
+        if not queue_exists(BASE_URL, QUEUE_NAME, AUTH):
+            print(f"Queue '{QUEUE_NAME}' does not exist. Creating...")
+            if create_queue(QUEUE_NAME, SOLACE_CLIENT_USER):
+                for TOPIC_SUBSCRIPTION in queue["subscriptions"]:
+                    add_subscription(TOPIC_SUBSCRIPTION, BASE_URL, QUEUE_NAME, HEADERS, AUTH)
         else:
-            print(f"Subscription '{TOPIC_SUBSCRIPTION}' already exists.")
+            print(f"Queue '{QUEUE_NAME}' already exists.")
+            for subscription in queue["subscriptions"]:
+                TOPIC_SUBSCRIPTION = subscription["subscription"]
+                if not subscription_exists():
+                    print(f"Adding missing subscription '{TOPIC_SUBSCRIPTION}'...")
+                    add_subscription(TOPIC_SUBSCRIPTION, BASE_URL, QUEUE_NAME, HEADERS, AUTH)
+                else:
+                    print(f"Subscription '{TOPIC_SUBSCRIPTION}' already exists.")
 
     print("Done.")

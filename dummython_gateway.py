@@ -1,5 +1,4 @@
 import os
-import uuid
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 import xml.etree.ElementTree as ET
@@ -16,8 +15,6 @@ import pandas as pd
 import numpy as np
 from sklearn.ensemble import IsolationForest
 from sklearn.preprocessing import StandardScaler
-# neo4j
-from neo4j import GraphDatabase
 # ez
 from ez_config_loader import ConfigLoader
 from ez_opentelemetry import *
@@ -50,8 +47,8 @@ def initialize_db():
     conn.commit()
     return conn
 
-def insert_transaction(conn, transaction_json, neo4j_driver):
-    """Run external fraud check then insert transaction and fraud score into SQLite and Neo4j."""
+def insert_transaction(conn, transaction_json):
+    """Run external fraud check then insert transaction and fraud score into SQLite."""
     cursor = conn.cursor()
     transaction = json.loads(transaction_json)
 
@@ -83,47 +80,6 @@ def insert_transaction(conn, transaction_json, neo4j_driver):
         transaction['cleaning'],transaction['dli'],transaction['sri'],transaction['odi']
     ))
     conn.commit()
-
-    # Insert into Neo4j
-    with neo4j_driver.session() as session:
-        tprint(transaction)
-        session.execute_write(create_graph, transaction)
-        pass
-
-def create_graph(tx, transaction):
-    """Create nodes and relationships in Neo4j."""
-    query = """
-    MERGE (pi:PlantID {dt: $plant_id})
-    MERGE (bi:BuildingID {dt: $building_id})
-    MERGE (mi:MachineID {dt: $machine_id})
-    MERGE (cp:CpaID {dt: $cpaid})
-    MERGE (cid:ConversationID {dt: $conversationid})
-    MERGE (s:Service {dt: $service})
-    MERGE (a:Action {dt: $action})
-    MERGE (dl:DustLevel {dt: $dust})
-    MERGE (sr:StickyResidu {dt: $sticky})
-    MERGE (od:Odor {dt: $odor})
-    MERGE (p:payload {dt: $payload, timestamp: datetime($timestamp)})
-    MERGE (pi)-[:HAS_CID]->(cid)
-    MERGE (pi)-[:LOCATES]->(bi)
-    MERGE (pi)-[:HAS_CPA]->(cp)
-    MERGE (bi)-[:HAS_CID]->(cid)
-    MERGE (bi)-[:HAS]->(mi)
-    MERGE (bi)-[:HAS_SERVICE]->(s)
-    MERGE (mi)-[:HAS_CID]->(cid)
-    MERGE (mi)-[:HAS_PAYLOAD]->(p)
-    MERGE (mi)-[:HAS_ACTION]->(a)
-    MERGE (mi)-[:HAS_DUSTLEVEL]->(dl)
-    MERGE (mi)-[:HAS_STICKYRESIDU]->(sr)
-    MERGE (mi)-[:HAS_ODOR]->(od)
-    MERGE (mi)-[:NEEDS_CLEANING]->(od)
-    """
-    transaction['txid'] = str(uuid.uuid4())
-    tx.run(query, **transaction)
-
-def initialize_neo4j():
-    """Initialize Neo4j database connection."""
-    return GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USERNAME, NEO4J_PASSWORD))
 
 def tprint(string=""):
     """Takes a string and prints it with a timestamp prefixt."""
@@ -199,7 +155,7 @@ class SOAPRequestHandler(BaseHTTPRequestHandler):
         })
 
         # analysis
-        insert_transaction(conn, json_message, neo4j_driver)
+        insert_transaction(conn, json_message)
         analyze_fraud(conn)
 
         # NOTE: conversationid now contains combined value of {plant_id}/{building_id}/{machine_id}
@@ -286,17 +242,24 @@ def analyze_fraud(conn):
         df['high_risk_dust'] + df['high_risk_sticky'] + df['high_risk_odor']
     )
 
-    flagged_transactions = df[df['final_cleaning_risk'] > 1]
-    title = "\nPotential Cleaning Issue With Machine:\n"
-    # Print potential risk transactions to console and report
-    tprint(f"{bcolors.WARNING}")
-    tprint(title)
-    tprint(flagged_transactions)
+    # Print potential high and low risk transactions to console and report
+    high_risk_transactions = df[df['final_cleaning_risk'] > 1]
+    low_risk_transactions = df[df['final_cleaning_risk'] < .3]
+    high_risk_title = "\nPotential High Risk Cleaning Issue With Machine:\n"
+    low_risk_title = "\nPotential Low Risk Cleaning Issue With Machine:\n"
+    tprint(f"{bcolors.OKCYAN}")
+    tprint(high_risk_title)
+    tprint(high_risk_transactions)
+    tprint(f"{bcolors.OKBLUE}")
+    tprint(low_risk_title)
+    tprint(low_risk_transactions)
     tprint(f"{bcolors.ENDC}")
     report_file = open(REPORT_FILE, "a")
-    report_file.write(title)
-    report_file.write(flagged_transactions.to_string())
-    return flagged_transactions
+    report_file.write(high_risk_title)
+    report_file.write(high_risk_transactions.to_string())
+    report_file.write(low_risk_title)
+    report_file.write(low_risk_transactions.to_string())
+    return
 
 class bcolors:
     HEADER = '\033[95m'
@@ -337,13 +300,7 @@ if __name__ == "__main__":
 
     SOLACE_TCP_PROTOCOL = os.environ["SOLACE_TCP_PROTOCOL"]
 
-    NEO4J_USERNAME = os.environ["NEO4J_USERNAME"]
-    NEO4J_PASSWORD = os.environ["NEO4J_PASSWORD"]
-    NEO4J_URI = os.environ["NEO4J_URI"]
-    NEO4J_CONSOLE = os.environ["NEO4J_CONSOLE"]
-
-    # TODO: Move to config.json app section
-    REPORT_FILE = "output/report.txt"
+    REPORT_FILE = config.get("app.report_file")
 
     broker_props = {
         "solace.messaging.transport.host": f"{SOLACE_TCP_PROTOCOL}{SOLACE_HOST}:{SOLACE_SMF_PORT}",
@@ -353,7 +310,7 @@ if __name__ == "__main__":
         #"solace.messaging.tls.trust-store-path": SOLACE_TRUSTSTORE_PEM
     }
 
-    if SOLACE_TCP_PROTOCOL == 'tcp://': # TODO: sloppy... todo: proper check/setup
+    if SOLACE_TCP_PROTOCOL == 'tcp://': # TODO: sloppy... replace with proper check/setup (as in other repo)
         # Initialize Solace Messaging Service
         messaging_service = (
             MessagingService.builder()
@@ -381,6 +338,7 @@ if __name__ == "__main__":
     publisher.start()
     tprint("Pubsliher started...")
     tprint()
+
     # Initialize SQLite database (would be Neo4j, MongoDB Atlas, bank system, combination...)
     try:
         conn = initialize_db()
@@ -389,15 +347,6 @@ if __name__ == "__main__":
         tprint("- SQLite database not running")
         quit()
 
-    # Initialize Neo4j database
-    try:
-        neo4j_driver = initialize_neo4j()
-        neo4j_driver.verify_connectivity()
-        tprint(f"- Neo4j database running at {NEO4J_URI}, Neo4j Browser at {NEO4J_CONSOLE}")
-    except Exception as e:
-        tprint(f"- Neo4j database not connected: {e}")
-        quit()
-    
     # Start HTTP server
     try:
         tprint("HTTP server on port 54321 started")
