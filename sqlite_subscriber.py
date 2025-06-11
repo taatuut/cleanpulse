@@ -17,8 +17,10 @@ from sklearn.preprocessing import StandardScaler
 from ez_config_loader import ConfigLoader
 
 def initialize_db():
-    """Initialize the in-memory database and create a transactions table."""
-    conn = sqlite3.connect(':memory:', check_same_thread=False)
+    """Initialize the sqlite database and create a transactions table."""
+    # Use a file based database to be able to access for read and writeb from multiple processes (Python scripts)
+    #conn = sqlite3.connect(':memory:', check_same_thread=False)
+    conn = sqlite3.connect('shared.db', check_same_thread=False) # TODO: get db name from app config
     cursor = conn.cursor()
     cursor.execute('''
         CREATE TABLE transactions (
@@ -200,7 +202,7 @@ if __name__ == "__main__":
     # Initialize SQLite database (would be Neo4j, MongoDB Atlas, bank system, combination...)
     try:
         conn = initialize_db()
-        tprint("- SQLite database running in memory")
+        tprint("- SQLite database running")
     except Exception as e:
         tprint(f"- SQLite database not running: {e}")
         quit()

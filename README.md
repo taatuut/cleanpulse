@@ -60,7 +60,7 @@ Install Python modules (optional: `upgrade pip`)
 
 ```
 python3 -m pip install --upgrade pip
-python3 -m pip install requests lxml solace-pubsubplus pyyaml pandas scikit-learn neo4j
+python3 -m pip install requests lxml solace-pubsubplus pyyaml pandas scikit-learn neo4j dash plotly
 ```
 
 ### Neo4j
@@ -136,7 +136,7 @@ This demo assumes using a local broker but configuration settings can be changed
 docker run -d -p 8080:8080 -p 55554:55555 -p 8008:8008 -p 1883:1883 -p 8000:8000 -p 5672:5672 -p 9000:9000 -p 2222:2222 --shm-size=2g --env username_admin_globalaccesslevel=$SOLACE_USER --env username_admin_password=$SOLACE_PASS --name=$SOLACE_NAME solace/solace-pubsub-standard
 ```
 
-2. To configure the Solace broker in tghe same or a new terminal run `python3 ez_broker_configuration.py`. This creates the required queue with topic subscription if not existing and will outoput something like below. Then check Broker management / Messaging / Queues for information on the configured queue.
+2. To configure the Solace broker in the same or a new terminal run `python3 ez_broker_configuration.py`. This creates the required queue with topic subscription if not existing and will outoput something like below. Then check Broker management / Messaging / Queues for information on the configured queue.
 
 ```
 python3 ez_broker_configuration.py
@@ -187,7 +187,7 @@ python3 neo4j_subscriber.py
 
 ```
 python3 sqlite_subscriber.py
-[2025-06-11 21:20:11] - SQLite database running in memory
+[2025-06-11 21:20:11] - SQLite database running
 [2025-06-11 21:20:11] Connect to Solace broker...
 [2025-06-11 21:20:11]
 [2025-06-11 21:20:11] Receiver is running. Press Ctrl+C to stop.
@@ -199,6 +199,12 @@ python3 sqlite_subscriber.py
 - to the gateway started in the previous step: the gateway processes the message (conversion from XML to json, setting dynamic topic) and then sends it to the Solace PubSub+ broker using SMF protocol.
 
 To execute once run `python3 dummythonSoapSender.py`, or run repeatedly every five seconds with `while true; do python3 dummythonSoapSender.py; sleep 5; done`
+
+7. In a last terminal run the live dashboard todo bla
+
+```
+python3 dashboard.py
+```
 
 ## Subscribing
 Client applications you can use to subscribe to the topic or queue on the broker (see `config.json` for name) to display and/or consume the published messages:
