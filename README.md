@@ -60,35 +60,95 @@ Install Python modules (optional: `upgrade pip`)
 
 ```
 python3 -m pip install --upgrade pip
-python3 -m pip install requests lxml solace-pubsubplus pyyaml pandas scikit-learn neo4j dash plotly
+python3 -m pip install requests lxml solace-pubsubplus pyyaml pandas scikit-learn neo4j dash plotly solace-agent-mesh
+```
+
+### Solace Agent Mesh - SAM
+
+Run `solace-agent-mesh --version` to verify your SAM installation. Will respond with something like `solace-agent-mesh, version 0.2.3`.
+
+Create SAM project folder and go there with `mkdir -p ezsam && cd ezsam && touch .empty`.
+
+Run `solace-agent-mesh init` and follow the prompts to create your project.
+
+In the web interface select [ Get Started Quickly ] and click [ Next ]
+
+In next screen enter details as below and click [ Next ]
+
+```
+OpenAI Compatible Provider
+https://lite-llm.mymaas.net/
+<LiteLLM_API_key>
+azure-gpt-4o
+```
+
+Output will look somethign like:
+
+```
+solace-agent-mesh init
+Initializing Solace Agent Mesh
+Would you like to configure your project through a web interface in your browser? [Y/n]: 
+Step 1 of 1: Initilize in web
+Web configuration portal is running at http://127.0.0.1:5002
+Complete the configuration in your browser to continue...
+Configuration received from portal
+Project files have been created.
+Created the following gateway template files:
+  - ./configs/gateways/rest_api/rest-api.yaml
+  - ./configs/gateways/rest_api/gateway.yaml
+Solace Agent Mesh has been initialized
+Review the `solace-agent-mesh` config file and make any necessary changes.
+To get started, use the `solace-agent-mesh add` command to add agents and gateways
+```
+
+To build and start the Solace Agent Mesh service, run `sam run -b`. You can use `sam` as a shorthand for `solace-agent-mesh` in all commands. See appendix for output.
+
+Now add the SQL Database plugin to your SAM project:
+
+```
+solace-agent-mesh plugin add sam_sql_database --pip -u git+https://github.com/SolaceLabs/solace-agent-mesh-core-plugins#subdirectory=sam-sql-database
+Module 'sam_sql_database' not found. Attempting to install 'git+https://github.com/SolaceLabs/solace-agent-mesh-core-plugins#subdirectory=sam-sql-database' using pip...
+Collecting git+https://github.com/SolaceLabs/solace-agent-mesh-core-plugins#subdirectory=sam-sql-database
+  Cloning https://github.com/SolaceLabs/solace-agent-mesh-core-plugins to /private/var/folders/f5/dymfy2kx71l1wqwygnkz4fw40000gn/T/pip-req-build-wcp808oq
+  Running command git clone --filter=blob:none --quiet https://github.com/SolaceLabs/solace-agent-mesh-core-plugins /private/var/folders/f5/dymfy2kx71l1wqwygnkz4fw40000gn/T/pip-req-build-wcp808oq
+  Resolved https://github.com/SolaceLabs/solace-agent-mesh-core-plugins to commit da3096ba4103afa0fa399e29f4b2b044bbd49f5c
+  Installing build dependencies ... done
+  Getting requirements to build wheel ... done
+  Preparing metadata (pyproject.toml) ... done
+Collecting mysql-connector-python>=8.3.0 (from sam_sql_database==0.0.1)
+  Downloading mysql_connector_python-9.3.0-cp313-cp313-macosx_14_0_arm64.whl.metadata (7.5 kB)
+Collecting psycopg2-binary>=2.9.9 (from sam_sql_database==0.0.1)
+  Downloading psycopg2_binary-2.9.10-cp313-cp313-macosx_14_0_arm64.whl.metadata (4.9 kB)
+Collecting sqlalchemy>=2.0.25 (from sam_sql_database==0.0.1)
+  Downloading sqlalchemy-2.0.41-cp313-cp313-macosx_11_0_arm64.whl.metadata (9.6 kB)
+Collecting typing-extensions>=4.6.0 (from sqlalchemy>=2.0.25->sam_sql_database==0.0.1)
+  Downloading typing_extensions-4.14.0-py3-none-any.whl.metadata (3.0 kB)
+Downloading mysql_connector_python-9.3.0-cp313-cp313-macosx_14_0_arm64.whl (15.2 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 15.2/15.2 MB 4.9 MB/s eta 0:00:00
+Downloading psycopg2_binary-2.9.10-cp313-cp313-macosx_14_0_arm64.whl (3.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.3/3.3 MB 6.2 MB/s eta 0:00:00
+Downloading sqlalchemy-2.0.41-cp313-cp313-macosx_11_0_arm64.whl (2.1 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.1/2.1 MB 6.9 MB/s eta 0:00:00
+Downloading typing_extensions-4.14.0-py3-none-any.whl (43 kB)
+Building wheels for collected packages: sam_sql_database
+  Building wheel for sam_sql_database (pyproject.toml) ... done
+  Created wheel for sam_sql_database: filename=sam_sql_database-0.0.1-py3-none-any.whl size=19297 sha256=050bc62bec55753b807232fe1afa859b3c149a391f3b020935a5cec3ac713445
+  Stored in directory: /private/var/folders/f5/dymfy2kx71l1wqwygnkz4fw40000gn/T/pip-ephem-wheel-cache-havgj4gk/wheels/9c/33/11/590d2ff34c9055bbfa77cedcedd2230315b2f160ff6fb09705
+Successfully built sam_sql_database
+Installing collected packages: typing-extensions, psycopg2-binary, mysql-connector-python, sqlalchemy, sam_sql_database
+Successfully installed mysql-connector-python-9.3.0 psycopg2-binary-2.9.10 sam_sql_database-0.0.1 sqlalchemy-2.0.41 typing-extensions-4.14.0
+Failed to import module 'sam_sql_database' after installation.
+```
+
+Then create an agent instance based on the SQL database template:
+
+```
+sam add agent energy_usage_info --copy-from sam_sql_database:sql_database
+Could not find 'sam_sql_database' installed.
 ```
 
 ### Neo4j
 Install Neo4j using `brew install neo4j`, this icnludes `cypher-shell` cli for neo4j and `openjdk@21`, see Appendix Neo4j.
-
-To get a services overview use `brew services list`. Depending on services installed and their status it will show something like:
-
-```bash
-Name              Status  User       File
-dbus              none               
-docker-machine    none    emilzegers 
-mongodb-community started emilzegers ~/Library/LaunchAgents/homebrew.mxcl.mongodb-community.plist
-neo4j             started emilzegers ~/Library/LaunchAgents/homebrew.mxcl.neo4j.plist
-php               none               
-podman            none               
-postgresql@14     none               
-unbound           none               
-viam-server       none    
-```
-
-To (re)start with a clean database delete all nodes and relations run a cypher query in the Neo4j browser or use `cypher-shell` commands (see `PrepareEnvironment.sh`).
-
-```sql
-MATCH (n)
-DETACH DELETE n
-```
-
-NOTE: could run Neo4j in a container to make this a system independent component.
 
 ## Run
 Make sure shell scripts are executable
@@ -352,11 +412,14 @@ Source: https://docs.solace.com/API/API-Developer-Guide-Python/Python-API-Distri
 
 ## Next steps
 1.
+https://solacelabs.github.io/solace-agent-mesh/docs/documentation/tutorials/sql-database/
+
+2.
 Explore Message Transformation Approach using connector.
 
 https://docs.solace.com/API/Connectors/Self-Contained-Connectors/Message-Processor/Message-Processor-Overview.htm
 
-2.
+3.
 Observability Log fowarding, Insights monitoring, Distributed Tracing OpenTelemetry
 
 ## Appendices
@@ -417,7 +480,22 @@ a3663a4e4cd3   solace/solace-pubsub-standard   "/usr/sbin/boot.sh"   16 minutes 
 ```
 
 ### Appendix Neo4j
-`brew install neo4j`
+To get a services overview use `brew services list`. Depending on services installed and their status it will show something like:
+
+```bash
+Name              Status  User       File
+dbus              none               
+docker-machine    none    emilzegers 
+mongodb-community started emilzegers ~/Library/LaunchAgents/homebrew.mxcl.mongodb-community.plist
+neo4j             started emilzegers ~/Library/LaunchAgents/homebrew.mxcl.neo4j.plist
+php               none               
+podman            none               
+postgresql@14     none               
+unbound           none               
+viam-server       none    
+```
+
+To install run `brew install neo4j`
 
 ```
 Warning: Treating neo4j as a formula. For the cask, use homebrew/cask/neo4j or specify the `--cask` flag. To silence this message, use the `--formula` flag.
@@ -477,3 +555,110 @@ brew services start neo4j
 Much change default user:pass `neo4j:neo4j` first. Go to http://localhost:7474/browser/
 
 To install just `cypher-shell` on a machine use `brew install cypher-shell`
+
+To (re)start with a clean database delete all nodes and relations run a cypher query in the Neo4j browser or use `cypher-shell` commands (see `PrepareEnvironment.sh`).
+
+```sql
+MATCH (n)
+DETACH DELETE n
+```
+
+NOTE: could run Neo4j in a container to make this a system independent component.
+
+### Appendix SAM
+
+```
+sam run -b             
+Building Solace Agent Mesh application
+No user defined modules were found at './modules'.
+No user defined agents were found at './configs/agents'.
+Building gateways.
+Building gateway in subdirectory: rest_api
+Building gateway template.
+Getting interface types.
+Building built-in agents.
+Building configs required for Solace Agent Mesh.
+Skipping embedding service as it is disabled.
+Created runtime config at ./build/config.yaml
+Environment variables extracted to ./.env
+Build completed.
+        Build directory: ./build
+Running Solace Agent Mesh application
+Starting Solace AI Event Connector
+Creating app monitor_stim_and_errors_to_slack
+Creating flow event_monitor in app monitor_stim_and_errors_to_slack
+Creating flow slack_notification in app monitor_stim_and_errors_to_slack
+Creating app conversation_to_file
+Creating flow write_to_file in app conversation_to_file
+Creating app visualize_websocket
+Creating flow visualize_websocket in app visualize_websocket
+Creating app error_catcher
+Creating flow error-catcher-flow in app error_catcher
+Creating app agent_web_request
+Creating flow action_request_processor in app agent_web_request
+Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
+Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
+Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
+Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
+Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
+Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
+Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
+Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
+Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
+Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
+Creating app monitor_user_feedback
+Creating flow feedback_monitor in app monitor_user_feedback
+Creating app orchestrator
+Creating flow orchestrator_register in app orchestrator
+Creating flow orchestrator_stimulus_input in app orchestrator
+Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
+Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
+Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
+Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
+Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
+Creating flow orchestrator_action_response in app orchestrator
+Creating flow streaming_output in app orchestrator
+Creating flow action_manager_timer in app orchestrator
+Creating app gateway_rest_api_rest_api
+Creating flow web_ui in app gateway_rest_api_rest_api
+Creating flow rest_gateway_input_flow in app gateway_rest_api_rest_api
+Creating flow rest_gateway_output_flow in app gateway_rest_api_rest_api
+Creating app agent_global
+Creating flow global_agent_action_request_processor in app agent_global
+Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
+Creating app service_llm
+Creating flow llm-service-planning in app service_llm
+Exception in thread Thread-92 (run_server):
+Traceback (most recent call last):
+  File "/opt/homebrew/Cellar/python@3.12/3.12.10_1/Frameworks/Python.framework/Versions/3.12/lib/python3.12/threading.py", line 1075, in _bootstrap_inner
+    self.run()
+  File "/opt/homebrew/Cellar/python@3.12/3.12.10_1/Frameworks/Python.framework/Versions/3.12/lib/python3.12/threading.py", line 1012, in run
+    self._target(*self._args, **self._kwargs)
+  File "/Users/emilzegers/.venv/lib/python3.12/site-packages/solace_ai_connector/components/inputs_outputs/websocket_base.py", line 112, in run_server
+    self.http_server.serve_forever()
+  File "/Users/emilzegers/.venv/lib/python3.12/site-packages/gevent/baseserver.py", line 398, in serve_forever
+    self.start()
+  File "/Users/emilzegers/.venv/lib/python3.12/site-packages/gevent/baseserver.py", line 336, in start
+    self.init_socket()
+  File "/Users/emilzegers/.venv/lib/python3.12/site-packages/gevent/pywsgi.py", line 1672, in init_socket
+    StreamServer.init_socket(self)
+  File "/Users/emilzegers/.venv/lib/python3.12/site-packages/gevent/server.py", line 173, in init_socket
+    self.socket = self.get_listener(self.address, self.backlog, self.family)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/emilzegers/.venv/lib/python3.12/site-packages/gevent/server.py", line 185, in get_listener
+    return _tcp_listener(address, backlog=backlog, reuse_addr=cls.reuse_addr, family=family)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/emilzegers/.venv/lib/python3.12/site-packages/gevent/server.py", line 264, in _tcp_listener
+    sock.bind(address)
+  File "/Users/emilzegers/.venv/lib/python3.12/site-packages/gevent/_socketcommon.py", line 543, in bind
+    return self._sock.bind(address)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: [Errno 48] Address already in use: ('0.0.0.0', 5000)
+Solace AI Event Connector started successfully
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:5050
+Press CTRL+C to quit
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://localhost:5001
+Press CTRL+C to quit
+```
