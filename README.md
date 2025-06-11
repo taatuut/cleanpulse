@@ -128,7 +128,9 @@ removed output files
 ## Publishing
 To run a Solace broker use Solace PubSub+ Cloud platform or a local Solace event broker container image. To run a local broker use a tool like Docker Desktop or Podman Desktop, or go without desktop and use something like `colima`.
 
-This demo assumes using a local broker but configuration settings can be changed to work with a cloud broker too. 
+This demo assumes using a local broker but configuration settings can be changed to work with a cloud broker too.
+
+Step 1 and 2 are also included in the `PrepareEnvironment.sh` shell script.
 
 1. To run a Solace PubSub+ Event Broker container image run the following command. Note that the usage of environment variables assumes these are sourced before, also on Mac OS port 55555 must be mapped to 55554 as this is a reserved port since MacOS Big Sur.
 

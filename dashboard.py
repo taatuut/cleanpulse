@@ -40,7 +40,7 @@ app.title = "Real-Time Cleaning Metrics Dashboard"
 
 app.layout = html.Div([
     html.H2("Real-Time Cleaning Metrics Dashboard"),
-    dcc.Interval(id='interval', interval=5000, n_intervals=0),
+    dcc.Interval(id='interval', interval=1000, n_intervals=0),
 
     html.Div(id='metrics'),
     dcc.Graph(id='line-chart'),
