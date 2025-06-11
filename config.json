@@ -12,6 +12,18 @@
             ]
             },
             {
+            "name": "CUSTOM-QNAME-neo4j-json",
+            "subscriptions": [
+                "dummython/messages/json/>"
+            ]
+            },
+            {
+            "name": "CUSTOM-QNAME-sqlite-json",
+            "subscriptions": [
+                "dummython/messages/json/>"
+            ]
+            },
+            {
             "name": "CUSTOM-QNAME-dummython-xml",
             "subscriptions": [
                 "dummython/messages/xml/>",

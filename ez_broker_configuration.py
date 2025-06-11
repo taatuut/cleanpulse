@@ -89,8 +89,7 @@ if __name__ == "__main__":
                     add_subscription(TOPIC_SUBSCRIPTION, BASE_URL, QUEUE_NAME, HEADERS, AUTH)
         else:
             print(f"Queue '{QUEUE_NAME}' already exists.")
-            for subscription in queue["subscriptions"]:
-                TOPIC_SUBSCRIPTION = subscription["subscription"]
+            for TOPIC_SUBSCRIPTION in queue["subscriptions"]:
                 if not subscription_exists():
                     print(f"Adding missing subscription '{TOPIC_SUBSCRIPTION}'...")
                     add_subscription(TOPIC_SUBSCRIPTION, BASE_URL, QUEUE_NAME, HEADERS, AUTH)

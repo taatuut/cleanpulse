@@ -37,6 +37,15 @@ This demo is developed for Solace SKO FY26 on macOS using Python (3.10.6+) and C
 
 ## Setup
 
+### Set environment variables
+Check `sample.env` and copy/create `.env` with own values, then run:
+
+```
+source .env
+```
+
+Add relevant application information to configuration file `config.json`.
+
 ### Python
 
 Create and source a Python virtual environment, this demo use `~/.venv`.
@@ -44,9 +53,7 @@ Create and source a Python virtual environment, this demo use `~/.venv`.
 Open a terminal and run:
 
 ```
-mkdir -p ~/.venv
-python3 -m venv ~/.venv
-source ~/.venv/bin/activate
+mkdir -p ~/.venv && python3 -m venv ~/.venv && source ~/.venv/bin/activate
 ```
 
 Install Python modules (optional: `upgrade pip`)
@@ -118,15 +125,6 @@ removed transactions files
 removed output files
 ```
 
-## Set environment variables
-Check `sample.env` and copy/create `.env` with own values, then run:
-
-```
-source .env
-```
-
-Add relevant information to configuration file `config.json`.
-
 ## Publishing
 To run a Solace broker use Solace PubSub+ Cloud platform or a local Solace event broker container image. To run a local broker use a tool like Docker Desktop or Podman Desktop, or go without desktop and use something like `colima`.
 
@@ -142,28 +140,60 @@ docker run -d -p 8080:8080 -p 55554:55555 -p 8008:8008 -p 1883:1883 -p 8000:8000
 
 ```
 python3 ez_broker_configuration.py
-Queue 'CUSTOM-QNAME-dummython' does not exist. Creating...
-Queue 'CUSTOM-QNAME-dummython' created successfully.
-Subscription 'dummython/messages/>' added to queue 'CUSTOM-QNAME-dummython'.
+Queue 'CUSTOM-QNAME-dummython-json' does not exist. Creating...
+Queue 'CUSTOM-QNAME-dummython-json' created successfully.
+Subscription 'dummython/messages/json/>' added to queue 'CUSTOM-QNAME-dummython-json'.
+Subscription 'test/some/value' added to queue 'CUSTOM-QNAME-dummython-json'.
+Queue 'CUSTOM-QNAME-neo4j-json' does not exist. Creating...
+Queue 'CUSTOM-QNAME-neo4j-json' created successfully.
+Subscription 'dummython/messages/json/>' added to queue 'CUSTOM-QNAME-neo4j-json'.
+Queue 'CUSTOM-QNAME-sqlite-json' does not exist. Creating...
+Queue 'CUSTOM-QNAME-sqlite-json' created successfully.
+Subscription 'dummython/messages/json/>' added to queue 'CUSTOM-QNAME-sqlite-json'.
+Queue 'CUSTOM-QNAME-dummython-xml' does not exist. Creating...
+Queue 'CUSTOM-QNAME-dummython-xml' created successfully.
+Subscription 'dummython/messages/xml/>' added to queue 'CUSTOM-QNAME-dummython-xml'.
+Subscription 'test/another/value' added to queue 'CUSTOM-QNAME-dummython-xml'.
+Queue 'CUSTOM-QNAME-test' does not exist. Creating...
+Queue 'CUSTOM-QNAME-test' created successfully.
+Subscription 'test/>' added to queue 'CUSTOM-QNAME-test'.
 Done.
 ```
 
 Now open the Solace PubSub+ Event Broker management console at http://localhost:8080/ to check the configuration. 
 
-3. In a second terminal run the gateway with `python3 dummython_gateway.py`. Don't forget to `source .env` first. Will output something like:
+3. In a second terminal run the gateway with `python3 dummython_gateway.py`. Don't forget to source `.venv` and `.env` first. Will output something like:
 
 ```
 python3 dummython_gateway.py
-[2025-06-03 09:54:39] Connect to Solace broker...
-[2025-06-03 09:54:39] 
-[2025-06-03 09:54:39] Pubsliher started...
-[2025-06-03 09:54:39] 
-[2025-06-03 09:54:39] - SQLite database running in memory
-[2025-06-03 09:54:39] - Neo4j database running at neo4j://localhost:7687, Neo4j Browser at http://localhost:7474/
-[2025-06-03 09:54:39] HTTP server on port 54321 started
+[2025-06-11 21:15:23] Connect to Solace broker...
+[2025-06-11 21:15:23]
+[2025-06-11 21:15:23] Pubsliher started...
+[2025-06-11 21:15:23]
+[2025-06-11 21:15:23] HTTP server on port 54321 started
 ```
 
-4. Open a third terminal to send messages from. Make sure environment variables are available by running `source .env` and virtual environment is activated (run `source ~/.venv/bin/activate`). The messages are sent in two ways:
+4. In a third neo4j subscriber todo bla
+
+```
+python3 neo4j_subscriber.py
+[2025-06-11 21:17:45] - Neo4j database running at neo4j://localhost:7687, Neo4j Browser at http://localhost:7474/
+[2025-06-11 21:17:45] Connect to Solace broker...
+[2025-06-11 21:17:45]
+[2025-06-11 21:17:45] Receiver is running. Press Ctrl+C to stop.
+```
+
+5. In a fourth sqlite subscriber todo bla
+
+```
+python3 sqlite_subscriber.py
+[2025-06-11 21:20:11] - SQLite database running in memory
+[2025-06-11 21:20:11] Connect to Solace broker...
+[2025-06-11 21:20:11]
+[2025-06-11 21:20:11] Receiver is running. Press Ctrl+C to stop.
+```
+
+6. Open another terminal to send messages from. Make sure environment variables are available by running `source .env` and virtual environment is activated (run `source ~/.venv/bin/activate`). The messages are sent in two ways:
 
 - directly to the Solace PubSub+ broker REST API, and 
 - to the gateway started in the previous step: the gateway processes the message (conversion from XML to json, setting dynamic topic) and then sends it to the Solace PubSub+ broker using SMF protocol.

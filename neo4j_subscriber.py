@@ -141,16 +141,16 @@ if __name__ == "__main__":
 
     try:
         # Create queue receiver
-        QUEUE_NAME = 'CUSTOM-QNAME-dummython-json' # TODO: get from config
+        QUEUE_NAME = 'CUSTOM-QNAME-neo4j-json' # TODO: get from config
         queue = Queue.durable_exclusive_queue(QUEUE_NAME) 
         receiver = messaging_service.create_persistent_message_receiver_builder().build(queue)
         receiver.start()
         handler = MyMessageHandler(process_and_store)
         receiver.receive_async(handler)
-        print("Receiver is running. Press Ctrl+C to stop.")
+        tprint("Receiver is running. Press Ctrl+C to stop.")
         while True:
             time.sleep(1)  # Keeps the main thread alive
     except KeyboardInterrupt:
-        print("Shutting down...")
+        tprint("Shutting down...")
         receiver.terminate()
         messaging_service.disconnect()

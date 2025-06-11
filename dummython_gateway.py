@@ -1,85 +1,18 @@
+# general
 import os
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 import xml.etree.ElementTree as ET
+import time
+import re
+# solace
 from solace.messaging.messaging_service import MessagingService, RetryStrategy
 from solace.messaging.resources.topic import Topic
 from solace.messaging.config.transport_security_strategy import TLS
 from solace.messaging.config.authentication_strategy import ClientCertificateAuthentication
-import time
-import re
-# analytics
-import sqlite3
-import json
-import pandas as pd
-import numpy as np
-from sklearn.ensemble import IsolationForest
-from sklearn.preprocessing import StandardScaler
 # ez
 from ez_config_loader import ConfigLoader
 from ez_opentelemetry import *
-
-def initialize_db():
-    """Initialize the in-memory database and create a transactions table."""
-    conn = sqlite3.connect(':memory:', check_same_thread=False)
-    cursor = conn.cursor()
-    cursor.execute('''
-        CREATE TABLE transactions (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            plant_id TEXT,
-            building_id TEXT,
-            machine_id TEXT,
-            payload TEXT,
-            cpaid TEXT,
-            conversationid TEXT,
-            service TEXT,
-            action TEXT,
-            timestamp TEXT,
-            dust TEXT,
-            sticky TEXT,
-            odor TEXT,
-            cleaning TEXT,
-            dli INTEGER,
-            sri INTEGER,
-            odi INTEGER
-        )
-    ''')
-    conn.commit()
-    return conn
-
-def insert_transaction(conn, transaction_json):
-    """Run external fraud check then insert transaction and fraud score into SQLite."""
-    cursor = conn.cursor()
-    transaction = json.loads(transaction_json)
-
-    # Insert into SQLite
-    cursor.execute('''
-        INSERT INTO transactions (
-            plant_id,
-            building_id,
-            machine_id,
-            payload,
-            cpaid,
-            conversationid,
-            service,
-            action,
-            timestamp,
-            dust,
-            sticky,
-            odor,
-            cleaning,
-            dli,
-            sri,
-            odi
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ''', (
-        transaction['plant_id'], transaction['building_id'], transaction['machine_id'],
-        transaction['payload'], transaction['cpaid'], transaction['conversationid'],
-        transaction['service'], transaction['action'], transaction['timestamp'],
-        transaction['dust'], transaction['sticky'], transaction['odor'],
-        transaction['cleaning'],transaction['dli'],transaction['sri'],transaction['odi']
-    ))
-    conn.commit()
 
 def tprint(string=""):
     """Takes a string and prints it with a timestamp prefixt."""
@@ -154,10 +87,6 @@ class SOAPRequestHandler(BaseHTTPRequestHandler):
             "odi": odi
         })
 
-        # analysis
-        insert_transaction(conn, json_message)
-        analyze_fraud(conn)
-
         # NOTE: conversationid now contains combined value of {plant_id}/{building_id}/{machine_id}
         topic = (
             f"{APP_TOPIC}/json/v1/"
@@ -184,93 +113,6 @@ class SOAPRequestHandler(BaseHTTPRequestHandler):
         else:
             self.send_response(500)
             self.end_headers()
-
-def analyze_fraud(conn):
-    """Analyze transaction patterns using Isolation Forest to detect anomalies."""
-    # Get transactions table length first to determine if necessary to continue. Using COUNT(*) is faster than doing len(df) on SELECT *
-    # Note that COUNT(*) can be out of sync?
-    len_df = pd.read_sql_query("SELECT COUNT(*) FROM transactions", conn).iloc[0, 0]
-    
-    # Only train when nt new transactions are added
-    nt = 20
-    mod = len_df % nt
-    if mod != 0:
-        return
-
-    # Only train when mt minimum transactions is available
-    if len_df < 10:
-        print("Not enough data to train the model yet.")
-        return
-
-    df = pd.read_sql_query("SELECT * FROM transactions", conn)
-    len_df = len(df)
-
-    # Feature selection (excluding categorical/text fields)
-    features = ['dli', 'sri', 'odi']
-    X = df[features]
-    
-    # Normalize data
-    scaler = StandardScaler()
-    X_scaled = scaler.fit_transform(X)
-    
-    # Train Isolation Forest model
-    model = IsolationForest(contamination=0.05, random_state=42)
-    model.fit(X_scaled)
-    df['anomaly_score'] = model.decision_function(X_scaled)
-    df['is_anomaly'] = model.predict(X_scaled)
-
-    # Compute peer-group mean transaction deviations
-    peer_group_means = df.groupby('machine_id')[['dli', 'sri', 'odi']].transform('mean')
-    # df['peer_deviation'] = abs(df[['dli', 'sri', 'odi']].sum(axis=1) - peer_group_means) / peer_group_means
-    peer_sum = peer_group_means.sum(axis=1)  # sum of means per row (Series)
-    df_sum = df[['dli', 'sri', 'odi']].sum(axis=1)  # sum per row (Series)
-    df['peer_deviation'] = abs(df_sum - peer_sum) / peer_sum
-
-
-    # Rule-based checks: Flagging risky payment types and high-risk bank locations
-    high_risk_dust = ['high']
-    high_risk_sticky = ['excessive']
-    high_risk_odor = ['noticeable', 'strong']
-
-    df['high_risk_dust'] = df['dust'].isin(high_risk_dust).astype(int)
-    df['high_risk_sticky'] = df['sticky'].isin(high_risk_sticky).astype(int)
-    df['high_risk_odor'] = df['odor'].isin(high_risk_odor).astype(int)
-        
-    # Final fraud risk score
-    df['final_cleaning_risk'] = (
-        (df['is_anomaly'] == -1).astype(int) + (df['peer_deviation'] > 2).astype(int) + 
-        df['high_risk_dust'] + df['high_risk_sticky'] + df['high_risk_odor']
-    )
-
-    # Print potential high and low risk transactions to console and report
-    high_risk_transactions = df[df['final_cleaning_risk'] > 1]
-    low_risk_transactions = df[df['final_cleaning_risk'] < .3]
-    high_risk_title = "\nPotential High Risk Cleaning Issue With Machine:\n"
-    low_risk_title = "\nPotential Low Risk Cleaning Issue With Machine:\n"
-    tprint(f"{bcolors.OKCYAN}")
-    tprint(high_risk_title)
-    tprint(high_risk_transactions)
-    tprint(f"{bcolors.OKBLUE}")
-    tprint(low_risk_title)
-    tprint(low_risk_transactions)
-    tprint(f"{bcolors.ENDC}")
-    report_file = open(REPORT_FILE, "a")
-    report_file.write(high_risk_title)
-    report_file.write(high_risk_transactions.to_string())
-    report_file.write(low_risk_title)
-    report_file.write(low_risk_transactions.to_string())
-    return
-
-class bcolors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKCYAN = '\033[96m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
 
 def publish_to_solace(topic, message):
     """Publishes message to Solace broker using SMF protocol."""
@@ -299,8 +141,6 @@ if __name__ == "__main__":
     SOLACE_TRUSTSTORE_PEM = os.environ["SOLACE_TRUSTSTORE_PEM"]
 
     SOLACE_TCP_PROTOCOL = os.environ["SOLACE_TCP_PROTOCOL"]
-
-    REPORT_FILE = config.get("app.report_file")
 
     broker_props = {
         "solace.messaging.transport.host": f"{SOLACE_TCP_PROTOCOL}{SOLACE_HOST}:{SOLACE_SMF_PORT}",
@@ -338,14 +178,6 @@ if __name__ == "__main__":
     publisher.start()
     tprint("Pubsliher started...")
     tprint()
-
-    # Initialize SQLite database (would be Neo4j, MongoDB Atlas, bank system, combination...)
-    try:
-        conn = initialize_db()
-        tprint("- SQLite database running in memory")
-    except Exception:
-        tprint("- SQLite database not running")
-        quit()
 
     # Start HTTP server
     try:
