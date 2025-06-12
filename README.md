@@ -154,12 +154,11 @@ Create a table summarizing number of machine per building per plant for company 
 What is the total number of machines at Dummython company.
 
 4.
-Create a trend analysis of the levels of dust, sticky stuff and odor at the machines, and return the results both as table and graphical charts.
-Use the trend analysis to predict which machines are likely to have the highest need for cleaning maintenance resources taking costs for energy, detergent, labour and revenue loss due to production impact into account.
-Return this predictive maintenance schedule as a nicely styled reported written for plant managers including an schedule for cleaning for the coming week for machine operators.
-If there is a need to create (temporary) files for (meta)data either create csv files or additional tables in the database. Provide reporting information on any csv files or database tables created. 
+Based on analysis of a combined ranking of the metrics for the levels of dust, sticky stuff and odor at the machines, using the representing values in columns sri, dli and odi, determine top 3 of machines for all buildings and plants that need to be stopped for cleaning maintenance and return the machine ids, and the estimated number of minutes the cleaning will take.
 
-Looks like processing the question is stuck in a loop. End the loop and use an alternative method to answer the question. 
+The dummython company now is AI enabled. The AI agent determines Top 3 of machines that need to be cleaned and predicts number of minutes needed, so you can calculate impact on production/revenue.
+Use the analysis to predict which machines are likely to have the highest need for cleaning maintenance resources taking costs for energy, detergent, labour and revenue loss due to production impact into account.
+Return this predictive maintenance schedule as a nicely styled reported written for plant managers including an schedule for cleaning for the coming week for machine operators.
 
 ### Neo4j
 Install Neo4j using `brew install neo4j`, this icnludes `cypher-shell` cli for neo4j and `openjdk@21`, see Appendix Neo4j.
