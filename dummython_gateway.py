@@ -12,7 +12,7 @@ from solace.messaging.config.transport_security_strategy import TLS
 from solace.messaging.config.authentication_strategy import ClientCertificateAuthentication
 # ez
 from ez_config_loader import ConfigLoader
-from ez_opentelemetry import *
+#from ez_opentelemetry import *
 
 def tprint(string=""):
     """Takes a string and prints it with a timestamp prefixt."""

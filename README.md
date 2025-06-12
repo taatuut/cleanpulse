@@ -82,7 +82,7 @@ https://lite-llm.mymaas.net/
 azure-gpt-4o
 ```
 
-Output will look somethign like:
+Output will look something like:
 
 ```
 solace-agent-mesh init
@@ -101,51 +101,65 @@ Review the `solace-agent-mesh` config file and make any necessary changes.
 To get started, use the `solace-agent-mesh add` command to add agents and gateways
 ```
 
-To build and start the Solace Agent Mesh service, run `sam run -b`. You can use `sam` as a shorthand for `solace-agent-mesh` in all commands. See appendix for output.
-
 Now add the SQL Database plugin to your SAM project:
 
 ```
 solace-agent-mesh plugin add sam_sql_database --pip -u git+https://github.com/SolaceLabs/solace-agent-mesh-core-plugins#subdirectory=sam-sql-database
+
 Module 'sam_sql_database' not found. Attempting to install 'git+https://github.com/SolaceLabs/solace-agent-mesh-core-plugins#subdirectory=sam-sql-database' using pip...
 Collecting git+https://github.com/SolaceLabs/solace-agent-mesh-core-plugins#subdirectory=sam-sql-database
-  Cloning https://github.com/SolaceLabs/solace-agent-mesh-core-plugins to /private/var/folders/f5/dymfy2kx71l1wqwygnkz4fw40000gn/T/pip-req-build-wcp808oq
-  Running command git clone --filter=blob:none --quiet https://github.com/SolaceLabs/solace-agent-mesh-core-plugins /private/var/folders/f5/dymfy2kx71l1wqwygnkz4fw40000gn/T/pip-req-build-wcp808oq
+  Cloning https://github.com/SolaceLabs/solace-agent-mesh-core-plugins to /private/var/folders/f5/dymfy2kx71l1wqwygnkz4fw40000gn/T/pip-req-build-98llfgm2
+  Running command git clone --filter=blob:none --quiet https://github.com/SolaceLabs/solace-agent-mesh-core-plugins /private/var/folders/f5/dymfy2kx71l1wqwygnkz4fw40000gn/T/pip-req-build-98llfgm2
   Resolved https://github.com/SolaceLabs/solace-agent-mesh-core-plugins to commit da3096ba4103afa0fa399e29f4b2b044bbd49f5c
   Installing build dependencies ... done
   Getting requirements to build wheel ... done
   Preparing metadata (pyproject.toml) ... done
 Collecting mysql-connector-python>=8.3.0 (from sam_sql_database==0.0.1)
-  Downloading mysql_connector_python-9.3.0-cp313-cp313-macosx_14_0_arm64.whl.metadata (7.5 kB)
+  Using cached mysql_connector_python-9.3.0-cp313-cp313-macosx_14_0_arm64.whl.metadata (7.5 kB)
 Collecting psycopg2-binary>=2.9.9 (from sam_sql_database==0.0.1)
-  Downloading psycopg2_binary-2.9.10-cp313-cp313-macosx_14_0_arm64.whl.metadata (4.9 kB)
-Collecting sqlalchemy>=2.0.25 (from sam_sql_database==0.0.1)
-  Downloading sqlalchemy-2.0.41-cp313-cp313-macosx_11_0_arm64.whl.metadata (9.6 kB)
-Collecting typing-extensions>=4.6.0 (from sqlalchemy>=2.0.25->sam_sql_database==0.0.1)
-  Downloading typing_extensions-4.14.0-py3-none-any.whl.metadata (3.0 kB)
-Downloading mysql_connector_python-9.3.0-cp313-cp313-macosx_14_0_arm64.whl (15.2 MB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 15.2/15.2 MB 4.9 MB/s eta 0:00:00
-Downloading psycopg2_binary-2.9.10-cp313-cp313-macosx_14_0_arm64.whl (3.3 MB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.3/3.3 MB 6.2 MB/s eta 0:00:00
-Downloading sqlalchemy-2.0.41-cp313-cp313-macosx_11_0_arm64.whl (2.1 MB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.1/2.1 MB 6.9 MB/s eta 0:00:00
-Downloading typing_extensions-4.14.0-py3-none-any.whl (43 kB)
+  Using cached psycopg2_binary-2.9.10-cp313-cp313-macosx_14_0_arm64.whl.metadata (4.9 kB)
+Requirement already satisfied: sqlalchemy>=2.0.25 in /Users/emilzegers/.venv/lib/python3.13/site-packages (from sam_sql_database==0.0.1) (2.0.40)
+Requirement already satisfied: typing-extensions>=4.6.0 in /Users/emilzegers/.venv/lib/python3.13/site-packages (from sqlalchemy>=2.0.25->sam_sql_database==0.0.1) (4.14.0)
+Using cached mysql_connector_python-9.3.0-cp313-cp313-macosx_14_0_arm64.whl (15.2 MB)
+Using cached psycopg2_binary-2.9.10-cp313-cp313-macosx_14_0_arm64.whl (3.3 MB)
 Building wheels for collected packages: sam_sql_database
   Building wheel for sam_sql_database (pyproject.toml) ... done
   Created wheel for sam_sql_database: filename=sam_sql_database-0.0.1-py3-none-any.whl size=19297 sha256=050bc62bec55753b807232fe1afa859b3c149a391f3b020935a5cec3ac713445
-  Stored in directory: /private/var/folders/f5/dymfy2kx71l1wqwygnkz4fw40000gn/T/pip-ephem-wheel-cache-havgj4gk/wheels/9c/33/11/590d2ff34c9055bbfa77cedcedd2230315b2f160ff6fb09705
+  Stored in directory: /private/var/folders/f5/dymfy2kx71l1wqwygnkz4fw40000gn/T/pip-ephem-wheel-cache-s08ku__0/wheels/9c/33/11/590d2ff34c9055bbfa77cedcedd2230315b2f160ff6fb09705
 Successfully built sam_sql_database
-Installing collected packages: typing-extensions, psycopg2-binary, mysql-connector-python, sqlalchemy, sam_sql_database
-Successfully installed mysql-connector-python-9.3.0 psycopg2-binary-2.9.10 sam_sql_database-0.0.1 sqlalchemy-2.0.41 typing-extensions-4.14.0
-Failed to import module 'sam_sql_database' after installation.
+Installing collected packages: psycopg2-binary, mysql-connector-python, sam_sql_database
+Successfully installed mysql-connector-python-9.3.0 psycopg2-binary-2.9.10 sam_sql_database-0.0.1
+Successfully added plugin 'sam_sql_database'.
 ```
 
 Then create an agent instance based on the SQL database template:
 
 ```
 sam add agent energy_usage_info --copy-from sam_sql_database:sql_database
-Could not find 'sam_sql_database' installed.
+
+Copied agent 'energy_usage_info' from plugin 'sam_sql_database' at: ./configs/agents
 ```
+
+To build and start the Solace Agent Mesh service, run `sam run -b`. You can use `sam` as a shorthand for `solace-agent-mesh` in all commands. See appendix for output.
+
+Go to the interface (http://localhost:5001/) and ask the following questions, 1-3 are for verficiation.
+
+1.
+How many plants does Dummython company has?
+
+2.
+Create a table summarizing number of machine per building per plant for company Dummython. 
+
+3.
+What is the total number of machines at Dummython company.
+
+4.
+Create a trend analysis of the levels of dust, sticky stuff and odor at the machines, and return the results both as table and graphical charts.
+Use the trend analysis to predict which machines are likely to have the highest need for cleaning maintenance resources taking costs for energy, detergent, labour and revenue loss due to production impact into account.
+Return this predictive maintenance schedule as a nicely styled reported written for plant managers including an schedule for cleaning for the coming week for machine operators.
+If there is a need to create (temporary) files for (meta)data either create csv files or additional tables in the database. Provide reporting information on any csv files or database tables created. 
+
+Looks like processing the question is stuck in a loop. End the loop and use an alternative method to answer the question. 
 
 ### Neo4j
 Install Neo4j using `brew install neo4j`, this icnludes `cypher-shell` cli for neo4j and `openjdk@21`, see Appendix Neo4j.
@@ -235,7 +249,7 @@ python3 dummython_gateway.py
 [2025-06-11 21:15:23] HTTP server on port 54321 started
 ```
 
-4. In a third neo4j subscriber todo bla
+4. In a third terminal run the neo4j subscriber with `python3 neo4j_subscriber.py`.
 
 ```
 python3 neo4j_subscriber.py
@@ -245,7 +259,7 @@ python3 neo4j_subscriber.py
 [2025-06-11 21:17:45] Receiver is running. Press Ctrl+C to stop.
 ```
 
-5. In a fourth sqlite subscriber todo bla
+5. In a fourth terminal run the sqlite subscriber with `python3 sqlite_subscriber.py`.
 
 ```
 python3 sqlite_subscriber.py
@@ -262,11 +276,15 @@ python3 sqlite_subscriber.py
 
 To execute once run `python3 dummythonSoapSender.py`, or run repeatedly every five seconds with `while true; do python3 dummythonSoapSender.py; sleep 5; done`
 
-7. In a last terminal run the live dashboard todo bla
+7. In a last terminal run the live dashboard with `python3 dashboard.py`
 
 ```
 python3 dashboard.py
-```
+Dash is running on http://127.0.0.1:8050/
+
+ * Serving Flask app 'dashboard'
+ * Debug mode: on
+ ```
 
 ## Subscribing
 Client applications you can use to subscribe to the topic or queue on the broker (see `config.json` for name) to display and/or consume the published messages:
@@ -568,10 +586,10 @@ NOTE: could run Neo4j in a container to make this a system independent component
 ### Appendix SAM
 
 ```
-sam run -b             
+sam run -b
 Building Solace Agent Mesh application
 No user defined modules were found at './modules'.
-No user defined agents were found at './configs/agents'.
+Building agents.
 Building gateways.
 Building gateway in subdirectory: rest_api
 Building gateway template.
@@ -585,80 +603,145 @@ Build completed.
         Build directory: ./build
 Running Solace Agent Mesh application
 Starting Solace AI Event Connector
+Creating app agent_energy_usage_info
+Invalid 'config_parameters' in app_schema for app 'agent_energy_usage_info' (must be a list). Skipping validation.
+Creating flow energy_usage_info_action_request_processor in app agent_energy_usage_info
+[action_request_processor] [solace_ai_connector.energy_usage_info_action_request_processor.action_request_processor]  Using deprecated component-level 'broker_request_response' config. Consider migrating to app-level 'request_reply_enabled' in the 'broker' config.
+Invalid 'config_parameters' in app_schema for app '_internal_broker_request_response_app' (must be a list). Skipping validation.
+Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
+[action_request_processor] [solace_ai_connector.energy_usage_info_action_request_processor.action_request_processor]  Initialized component-level RequestResponseFlowController.
 Creating app monitor_stim_and_errors_to_slack
+Invalid 'config_parameters' in app_schema for app 'monitor_stim_and_errors_to_slack' (must be a list). Skipping validation.
 Creating flow event_monitor in app monitor_stim_and_errors_to_slack
 Creating flow slack_notification in app monitor_stim_and_errors_to_slack
 Creating app conversation_to_file
+Invalid 'config_parameters' in app_schema for app 'conversation_to_file' (must be a list). Skipping validation.
 Creating flow write_to_file in app conversation_to_file
 Creating app visualize_websocket
+Invalid 'config_parameters' in app_schema for app 'visualize_websocket' (must be a list). Skipping validation.
 Creating flow visualize_websocket in app visualize_websocket
 Creating app error_catcher
+Invalid 'config_parameters' in app_schema for app 'error_catcher' (must be a list). Skipping validation.
 Creating flow error-catcher-flow in app error_catcher
 Creating app agent_web_request
+Invalid 'config_parameters' in app_schema for app 'agent_web_request' (must be a list). Skipping validation.
 Creating flow action_request_processor in app agent_web_request
+[action_request_processor] [solace_ai_connector.action_request_processor.action_request_processor]  Using deprecated component-level 'broker_request_response' config. Consider migrating to app-level 'request_reply_enabled' in the 'broker' config.
+Invalid 'config_parameters' in app_schema for app '_internal_broker_request_response_app' (must be a list). Skipping validation.
 Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
+[action_request_processor] [solace_ai_connector.action_request_processor.action_request_processor]  Initialized component-level RequestResponseFlowController.
+[action_request_processor] [solace_ai_connector.action_request_processor.action_request_processor]  Using deprecated component-level 'broker_request_response' config. Consider migrating to app-level 'request_reply_enabled' in the 'broker' config.
+Invalid 'config_parameters' in app_schema for app '_internal_broker_request_response_app' (must be a list). Skipping validation.
 Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
+[action_request_processor] [solace_ai_connector.action_request_processor.action_request_processor]  Initialized component-level RequestResponseFlowController.
+[action_request_processor] [solace_ai_connector.action_request_processor.action_request_processor]  Using deprecated component-level 'broker_request_response' config. Consider migrating to app-level 'request_reply_enabled' in the 'broker' config.
+Invalid 'config_parameters' in app_schema for app '_internal_broker_request_response_app' (must be a list). Skipping validation.
 Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
+[action_request_processor] [solace_ai_connector.action_request_processor.action_request_processor]  Initialized component-level RequestResponseFlowController.
+[action_request_processor] [solace_ai_connector.action_request_processor.action_request_processor]  Using deprecated component-level 'broker_request_response' config. Consider migrating to app-level 'request_reply_enabled' in the 'broker' config.
+Invalid 'config_parameters' in app_schema for app '_internal_broker_request_response_app' (must be a list). Skipping validation.
 Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
+[action_request_processor] [solace_ai_connector.action_request_processor.action_request_processor]  Initialized component-level RequestResponseFlowController.
+[action_request_processor] [solace_ai_connector.action_request_processor.action_request_processor]  Using deprecated component-level 'broker_request_response' config. Consider migrating to app-level 'request_reply_enabled' in the 'broker' config.
+Invalid 'config_parameters' in app_schema for app '_internal_broker_request_response_app' (must be a list). Skipping validation.
 Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
+[action_request_processor] [solace_ai_connector.action_request_processor.action_request_processor]  Initialized component-level RequestResponseFlowController.
+[action_request_processor] [solace_ai_connector.action_request_processor.action_request_processor]  Using deprecated component-level 'broker_request_response' config. Consider migrating to app-level 'request_reply_enabled' in the 'broker' config.
+Invalid 'config_parameters' in app_schema for app '_internal_broker_request_response_app' (must be a list). Skipping validation.
 Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
+[action_request_processor] [solace_ai_connector.action_request_processor.action_request_processor]  Initialized component-level RequestResponseFlowController.
+[action_request_processor] [solace_ai_connector.action_request_processor.action_request_processor]  Using deprecated component-level 'broker_request_response' config. Consider migrating to app-level 'request_reply_enabled' in the 'broker' config.
+Invalid 'config_parameters' in app_schema for app '_internal_broker_request_response_app' (must be a list). Skipping validation.
 Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
+[action_request_processor] [solace_ai_connector.action_request_processor.action_request_processor]  Initialized component-level RequestResponseFlowController.
+[action_request_processor] [solace_ai_connector.action_request_processor.action_request_processor]  Using deprecated component-level 'broker_request_response' config. Consider migrating to app-level 'request_reply_enabled' in the 'broker' config.
+Invalid 'config_parameters' in app_schema for app '_internal_broker_request_response_app' (must be a list). Skipping validation.
 Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
+[action_request_processor] [solace_ai_connector.action_request_processor.action_request_processor]  Initialized component-level RequestResponseFlowController.
+[action_request_processor] [solace_ai_connector.action_request_processor.action_request_processor]  Using deprecated component-level 'broker_request_response' config. Consider migrating to app-level 'request_reply_enabled' in the 'broker' config.
+Invalid 'config_parameters' in app_schema for app '_internal_broker_request_response_app' (must be a list). Skipping validation.
 Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
+[action_request_processor] [solace_ai_connector.action_request_processor.action_request_processor]  Initialized component-level RequestResponseFlowController.
+[action_request_processor] [solace_ai_connector.action_request_processor.action_request_processor]  Using deprecated component-level 'broker_request_response' config. Consider migrating to app-level 'request_reply_enabled' in the 'broker' config.
+Invalid 'config_parameters' in app_schema for app '_internal_broker_request_response_app' (must be a list). Skipping validation.
 Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
+[action_request_processor] [solace_ai_connector.action_request_processor.action_request_processor]  Initialized component-level RequestResponseFlowController.
 Creating app monitor_user_feedback
+Invalid 'config_parameters' in app_schema for app 'monitor_user_feedback' (must be a list). Skipping validation.
 Creating flow feedback_monitor in app monitor_user_feedback
 Creating app orchestrator
+Invalid 'config_parameters' in app_schema for app 'orchestrator' (must be a list). Skipping validation.
 Creating flow orchestrator_register in app orchestrator
 Creating flow orchestrator_stimulus_input in app orchestrator
+[orchestrator_stimulus_processor] [solace_ai_connector.orchestrator_stimulus_input.orchestrator_stimulus_processor]  Using deprecated component-level 'broker_request_response' config. Consider migrating to app-level 'request_reply_enabled' in the 'broker' config.
+Invalid 'config_parameters' in app_schema for app '_internal_broker_request_response_app' (must be a list). Skipping validation.
 Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
+[orchestrator_stimulus_processor] [solace_ai_connector.orchestrator_stimulus_input.orchestrator_stimulus_processor]  Initialized component-level RequestResponseFlowController.
+[orchestrator_stimulus_processor] [solace_ai_connector.orchestrator_stimulus_input.orchestrator_stimulus_processor]  Using deprecated component-level 'broker_request_response' config. Consider migrating to app-level 'request_reply_enabled' in the 'broker' config.
+Invalid 'config_parameters' in app_schema for app '_internal_broker_request_response_app' (must be a list). Skipping validation.
 Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
+[orchestrator_stimulus_processor] [solace_ai_connector.orchestrator_stimulus_input.orchestrator_stimulus_processor]  Initialized component-level RequestResponseFlowController.
+[orchestrator_stimulus_processor] [solace_ai_connector.orchestrator_stimulus_input.orchestrator_stimulus_processor]  Using deprecated component-level 'broker_request_response' config. Consider migrating to app-level 'request_reply_enabled' in the 'broker' config.
+Invalid 'config_parameters' in app_schema for app '_internal_broker_request_response_app' (must be a list). Skipping validation.
 Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
+[orchestrator_stimulus_processor] [solace_ai_connector.orchestrator_stimulus_input.orchestrator_stimulus_processor]  Initialized component-level RequestResponseFlowController.
+[orchestrator_stimulus_processor] [solace_ai_connector.orchestrator_stimulus_input.orchestrator_stimulus_processor]  Using deprecated component-level 'broker_request_response' config. Consider migrating to app-level 'request_reply_enabled' in the 'broker' config.
+Invalid 'config_parameters' in app_schema for app '_internal_broker_request_response_app' (must be a list). Skipping validation.
 Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
+[orchestrator_stimulus_processor] [solace_ai_connector.orchestrator_stimulus_input.orchestrator_stimulus_processor]  Initialized component-level RequestResponseFlowController.
+[orchestrator_stimulus_processor] [solace_ai_connector.orchestrator_stimulus_input.orchestrator_stimulus_processor]  Using deprecated component-level 'broker_request_response' config. Consider migrating to app-level 'request_reply_enabled' in the 'broker' config.
+Invalid 'config_parameters' in app_schema for app '_internal_broker_request_response_app' (must be a list). Skipping validation.
 Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
+[orchestrator_stimulus_processor] [solace_ai_connector.orchestrator_stimulus_input.orchestrator_stimulus_processor]  Initialized component-level RequestResponseFlowController.
 Creating flow orchestrator_action_response in app orchestrator
 Creating flow streaming_output in app orchestrator
 Creating flow action_manager_timer in app orchestrator
 Creating app gateway_rest_api_rest_api
+Invalid 'config_parameters' in app_schema for app 'gateway_rest_api_rest_api' (must be a list). Skipping validation.
 Creating flow web_ui in app gateway_rest_api_rest_api
 Creating flow rest_gateway_input_flow in app gateway_rest_api_rest_api
 Creating flow rest_gateway_output_flow in app gateway_rest_api_rest_api
 Creating app agent_global
+Invalid 'config_parameters' in app_schema for app 'agent_global' (must be a list). Skipping validation.
 Creating flow global_agent_action_request_processor in app agent_global
+[action_request_processor] [solace_ai_connector.global_agent_action_request_processor.action_request_processor]  Using deprecated component-level 'broker_request_response' config. Consider migrating to app-level 'request_reply_enabled' in the 'broker' config.
+Invalid 'config_parameters' in app_schema for app '_internal_broker_request_response_app' (must be a list). Skipping validation.
 Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
+[action_request_processor] [solace_ai_connector.global_agent_action_request_processor.action_request_processor]  Initialized component-level RequestResponseFlowController.
 Creating app service_llm
+Invalid 'config_parameters' in app_schema for app 'service_llm' (must be a list). Skipping validation.
 Creating flow llm-service-planning in app service_llm
-Exception in thread Thread-92 (run_server):
+Exception in thread Thread-108 (run_server):
 Traceback (most recent call last):
-  File "/opt/homebrew/Cellar/python@3.12/3.12.10_1/Frameworks/Python.framework/Versions/3.12/lib/python3.12/threading.py", line 1075, in _bootstrap_inner
+  File "/opt/homebrew/Cellar/python@3.13/3.13.3_1/Frameworks/Python.framework/Versions/3.13/lib/python3.13/threading.py", line 1041, in _bootstrap_inner
     self.run()
-  File "/opt/homebrew/Cellar/python@3.12/3.12.10_1/Frameworks/Python.framework/Versions/3.12/lib/python3.12/threading.py", line 1012, in run
+    ~~~~~~~~^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.3_1/Frameworks/Python.framework/Versions/3.13/lib/python3.13/threading.py", line 992, in run
     self._target(*self._args, **self._kwargs)
-  File "/Users/emilzegers/.venv/lib/python3.12/site-packages/solace_ai_connector/components/inputs_outputs/websocket_base.py", line 112, in run_server
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/emilzegers/.venv/lib/python3.13/site-packages/solace_ai_connector/components/inputs_outputs/websocket_base.py", line 112, in run_server
     self.http_server.serve_forever()
-  File "/Users/emilzegers/.venv/lib/python3.12/site-packages/gevent/baseserver.py", line 398, in serve_forever
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/emilzegers/.venv/lib/python3.13/site-packages/gevent/baseserver.py", line 398, in serve_forever
     self.start()
-  File "/Users/emilzegers/.venv/lib/python3.12/site-packages/gevent/baseserver.py", line 336, in start
+    ~~~~~~~~~~^^
+  File "/Users/emilzegers/.venv/lib/python3.13/site-packages/gevent/baseserver.py", line 336, in start
     self.init_socket()
-  File "/Users/emilzegers/.venv/lib/python3.12/site-packages/gevent/pywsgi.py", line 1672, in init_socket
+    ~~~~~~~~~~~~~~~~^^
+  File "/Users/emilzegers/.venv/lib/python3.13/site-packages/gevent/pywsgi.py", line 1672, in init_socket
     StreamServer.init_socket(self)
-  File "/Users/emilzegers/.venv/lib/python3.12/site-packages/gevent/server.py", line 173, in init_socket
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/Users/emilzegers/.venv/lib/python3.13/site-packages/gevent/server.py", line 173, in init_socket
     self.socket = self.get_listener(self.address, self.backlog, self.family)
-                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/emilzegers/.venv/lib/python3.12/site-packages/gevent/server.py", line 185, in get_listener
+                  ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/emilzegers/.venv/lib/python3.13/site-packages/gevent/server.py", line 185, in get_listener
     return _tcp_listener(address, backlog=backlog, reuse_addr=cls.reuse_addr, family=family)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/emilzegers/.venv/lib/python3.12/site-packages/gevent/server.py", line 264, in _tcp_listener
+  File "/Users/emilzegers/.venv/lib/python3.13/site-packages/gevent/server.py", line 264, in _tcp_listener
     sock.bind(address)
-  File "/Users/emilzegers/.venv/lib/python3.12/site-packages/gevent/_socketcommon.py", line 543, in bind
+    ~~~~~~~~~^^^^^^^^^
+  File "/Users/emilzegers/.venv/lib/python3.13/site-packages/gevent/_socketcommon.py", line 543, in bind
     return self._sock.bind(address)
-           ^^^^^^^^^^^^^^^^^^^^^^^^
+           ~~~~~~~~~~~~~~~^^^^^^^^^
 OSError: [Errno 48] Address already in use: ('0.0.0.0', 5000)
 Solace AI Event Connector started successfully
-WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
- * Running on http://127.0.0.1:5050
-Press CTRL+C to quit
-WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
- * Running on http://localhost:5001
-Press CTRL+C to quit
 ```

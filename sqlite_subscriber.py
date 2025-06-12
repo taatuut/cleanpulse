@@ -23,7 +23,7 @@ def initialize_db():
     conn = sqlite3.connect('shared.db', check_same_thread=False) # TODO: get db name from app config
     cursor = conn.cursor()
     cursor.execute('''
-        CREATE TABLE transactions (
+        CREATE TABLE IF NOT EXISTS transactions (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             plant_id TEXT,
             building_id TEXT,
