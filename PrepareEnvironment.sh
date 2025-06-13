@@ -44,9 +44,9 @@ for constraint_name in $constraints; do
 done
 
 # Remove
-echo "Remove transactions files"
-rm -rf ./transactions/*.json
-mkdir -p ./transactions && touch ./transactions/.empty
-echo "Removed output files"
-rm -rf ./output/**
-mkdir -p ./output && touch ./output/.empty
+rm -rf ./transactions/*.json && echo "Removed transactions files"
+mkdir -p ./transactions && touch ./transactions/.empty && echo "Recreated transactions folder"
+rm -rf ./output/** && echo "Removed output files"
+mkdir -p ./output && touch ./output/.empty && echo "Recreated output folder"
+rm -f shared.db && echo "Removed SQLite databasde"
+rm -f ezsam/solace_agent_mesh.log ezsam/trace_None_default.txt ezsam/trace_None_None.txt && echo "Removed ezsam log and trace files"
