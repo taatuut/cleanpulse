@@ -1,10 +1,19 @@
+# general
 import os
+from http.server import BaseHTTPRequestHandler, HTTPServer
 import requests
 import uuid
 import random
 import datetime
+import time
+import threading
+from urllib.parse import urlparse, parse_qs
 # ez
 from ez_config_loader import ConfigLoader
+
+def tprint(string=""):
+    """Takes a string and prints it with a timestamp prefixt."""
+    print('[{}] {}'.format(time.strftime("%Y-%m-%d %H:%M:%S"), string))
 
 def generate_uuid():
     return str(uuid.uuid4())
@@ -79,6 +88,24 @@ def send_message(url, message, machine_id):
         print(f"An error occurred: {e}")
     return None
 
+class SOAPRequestHandler(BaseHTTPRequestHandler):
+    def do_POST(self):
+        content_length = int(self.headers['Content-Length'])
+        post_data = self.rfile.read(content_length).decode('utf-8')
+        tprint(post_data)
+        return
+
+    def do_GET(self):
+        # Parse URL
+        parsed_url = urlparse(self.path)
+        query_params = parse_qs(parsed_url.query)
+        # Prepare response
+        self.send_response(200)
+        self.end_headers()
+        response = f"{query_params}".encode()
+        self.wfile.write(response)
+        tprint(query_params)
+
 def main():
     # TODO: get ranges from config.json
     plant_id = 'plant' + str(random.randint(1, 3)) # 1-5
@@ -98,27 +125,40 @@ def main():
     m='not required' if w<70 else 'recommended' if w<=150 else 'urgently needed'
     payload = f"[{datetime.datetime.now().isoformat()}] Dust level: {dl}, Sticky residue: {sr}, Odor: {od}. Cleaning: {m}."
     soap_message = create_soap_message(plant_id, building_id, machine_id, payload, dli, sri, odi)
-    response = send_message(APP_URL, soap_message, machine_id)    
-    print()
+    response = send_message(APP_URL, soap_message, machine_id)
     if response:
-        print(f"SOAP request sent to Gateway {APP_URL}")
-        print("Gateway Response:")
-        print(f"Status Code: {response.status_code}")
-        print(f"Response headers: {response.headers}")
-        print(f"Response text: {response.text}")
+        tprint(f"SOAP request sent to Gateway {APP_URL}")
+        # tprint("Gateway Response:")
+        # tprint(f"Status Code: {response.status_code}")
+        # tprint(f"Response headers: {response.headers}")
+        # tprint(f"Response text: {response.text}")
     else:
-        print("Failed to send SOAP message to gateway.")
+        tprint("Failed to send SOAP message to gateway.")
     url = f"{SOLACE_REST_URL}/{APP_TOPIC}/xml/v1/{plant_id}/{building_id}/{machine_id}"
     response = send_message(url, soap_message, machine_id)
-    print()
     if response:
-        print(f"REST request sent to Solace broker {url}")
-        print("Broker Response:")
-        print(f"Status Code: {response.status_code}")
-        print(f"Response headers: {response.headers}")
-        print(f"Response text: {response.text}")
+        tprint(f"REST request sent to Solace broker {url}")
+        # tprint("Broker Response:")
+        # tprint(f"Status Code: {response.status_code}")
+        # tprint(f"Response headers: {response.headers}")
+        # tprint(f"Response text: {response.text}")
     else:
-        print("Failed to send SOAP message to Solace broker.")
+        tprint("Failed to send SOAP message to Solace broker.")
+
+def run_loop():
+    while True:
+        main()
+        time.sleep(.1)  # Optional interval between messages
+
+def run_http_server():
+    try:
+        tprint("Sender HTTP server on port 54322 started")
+        server_address = ('localhost', 54322)
+        httpd = HTTPServer(server_address, SOAPRequestHandler)
+        httpd.serve_forever()
+    except Exception as e:
+        tprint(f"Sender HTTP server not started: {e}")
+        quit()
 
 if __name__ == "__main__":
     # Load values from the configuration
@@ -141,5 +181,9 @@ if __name__ == "__main__":
     # Solace REST API URL
     SOLACE_REST_URL = f"{http_protocol}{userpass}{SOLACE_HOST}:{SOLACE_REST_PORT}"
 
-    main()
+    # Start the loop sending messages in a separate thread
+    loop_thread = threading.Thread(target=run_loop, daemon=True)
+    loop_thread.start()
 
+    # Start the HTTP server in the main thread
+    run_http_server()

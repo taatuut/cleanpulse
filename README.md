@@ -154,7 +154,14 @@ Create a table summarizing number of machine per building per plant for company 
 What is the total number of machines at Dummython company.
 
 4.
-Based on analysis of a combined ranking of the metrics for the levels of dust, sticky stuff and odor at the machines, using the representing values in columns sri, dli and odi, determine top 3 of machines for all buildings and plants that need to be stopped for cleaning maintenance and return the machine ids, and the estimated number of minutes the cleaning will take.
+CURL
+Based on analysis of a combined ranking of the metrics for the levels of dust, sticky stuff and odor at the machines, using the representing values in columns sri, dli and odi, determine top 3 of machines for all buildings and plants that need to be stopped for cleaning maintenance and create a curl POST request command to send the machine ids, and the estimated number of minutes the cleaning will take in json format to http://localhost:54322/ Provide the complete curl command as response.
+
+POST
+Based on analysis of a combined ranking of the metrics for the levels of dust, sticky stuff and odor at the machines, using the representing values in columns sri, dli and odi, determine top 3 of machines for all buildings and plants that need to be stopped for cleaning maintenance and create a POST request command to send the machine ids, and the estimated number of minutes the cleaning will take in json format to http://localhost:54322/ Do send the command and also provide the used command as response.
+
+GET
+Based on analysis of a combined ranking of the metrics for the levels of dust, sticky stuff and odor at the machines, using the representing values in columns sri, dli and odi, determine top 3 of machines for all buildings and plants that need to be stopped for cleaning maintenance and create a GET request command to send the machine ids, and the estimated number of minutes the cleaning will take as a url query string to http://localhost:54322/ Send the request and in the response provide the used request.
 
 The dummython company now is AI enabled. The AI agent determines Top 3 of machines that need to be cleaned and predicts number of minutes needed, so you can calculate impact on production/revenue.
 Use the analysis to predict which machines are likely to have the highest need for cleaning maintenance resources taking costs for energy, detergent, labour and revenue loss due to production impact into account.
@@ -237,10 +244,10 @@ Done.
 
 Now open the Solace PubSub+ Event Broker management console at http://localhost:8080/ to check the configuration. 
 
-3. In a second terminal run the gateway with `python3 dummython_gateway.py`. Don't forget to source `.venv` and `.env` first. Will output something like:
+3. In a second terminal run the gateway with `python3 ez_gateway.py`. Don't forget to source `.venv` and `.env` first. Will output something like:
 
 ```
-python3 dummython_gateway.py
+python3 ez_gateway.py
 [2025-06-11 21:15:23] Connect to Solace broker...
 [2025-06-11 21:15:23]
 [2025-06-11 21:15:23] Pubsliher started...
@@ -248,20 +255,20 @@ python3 dummython_gateway.py
 [2025-06-11 21:15:23] HTTP server on port 54321 started
 ```
 
-4. In a third terminal run the neo4j subscriber with `python3 neo4j_subscriber.py`.
+4. In a third terminal run the neo4j subscriber with `python3 subscriber_neo4j.py`.
 
 ```
-python3 neo4j_subscriber.py
+python3 subscriber_neo4j.py
 [2025-06-11 21:17:45] - Neo4j database running at neo4j://localhost:7687, Neo4j Browser at http://localhost:7474/
 [2025-06-11 21:17:45] Connect to Solace broker...
 [2025-06-11 21:17:45]
 [2025-06-11 21:17:45] Receiver is running. Press Ctrl+C to stop.
 ```
 
-5. In a fourth terminal run the sqlite subscriber with `python3 sqlite_subscriber.py`.
+5. In a fourth terminal run the sqlite subscriber with `python3 subscriber_sqlite.py`.
 
 ```
-python3 sqlite_subscriber.py
+python3 subscriber_sqlite.py
 [2025-06-11 21:20:11] - SQLite database running
 [2025-06-11 21:20:11] Connect to Solace broker...
 [2025-06-11 21:20:11]
@@ -273,7 +280,7 @@ python3 sqlite_subscriber.py
 - directly to the Solace PubSub+ broker REST API, and 
 - to the gateway started in the previous step: the gateway processes the message (conversion from XML to json, setting dynamic topic) and then sends it to the Solace PubSub+ broker using SMF protocol.
 
-To execute once run `python3 dummythonSoapSender.py`, or run repeatedly every five seconds with `while true; do python3 dummythonSoapSender.py; sleep 5; done`
+Run `python3 ez_machine.py`, in this script you can set a sleep value to only send a message at certain interval.
 
 7. In a last terminal run the live dashboard with `python3 dashboard.py`
 
@@ -324,7 +331,7 @@ Failed to create queue 'CUSTOM-QNAME-dummython': <html>
 
 If all is good check Broker management / Messaging / Queues for information on the configured queue.
 
-In all open terminals run `source .env.solace.cloud` and start scripts `python3 dummython_gateway.py` and `while true; do python3 dummythonSoapSender.py; sleep 5; done` again.
+In all open terminals run `source .env.solace.cloud` and start scripts `python3 ez_gateway.py` and `python3 ez_machine.py` again.
 
 Specific import statements for Solace secure connection:
 

@@ -181,10 +181,10 @@ if __name__ == "__main__":
 
     # Start HTTP server
     try:
-        tprint("HTTP server on port 54321 started")
+        tprint("Gateway HTTP server on port 54321 started")
         server_address = ('localhost', 54321)
         httpd = HTTPServer(server_address, SOAPRequestHandler)
         httpd.serve_forever()
     except Exception as e:
-        tprint(f"- HTTP server  not started: {e}")
+        tprint(f"Gateway HTTP server not started: {e}")
         quit()
