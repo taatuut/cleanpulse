@@ -1,6 +1,7 @@
 import threading
 import time
 import os
+import logging
 # solace
 from solace.messaging.messaging_service import MessagingService, RetryStrategy
 from solace.messaging.config.transport_security_strategy import TLS
@@ -17,7 +18,7 @@ SOLACE_TRUSTSTORE_PEM = os.environ["SOLACE_TRUSTSTORE_PEM"]
 
 SOLACE_TCP_PROTOCOL = os.environ["SOLACE_TCP_PROTOCOL"]
 
-NUM_CONNECTIONS = 999 # 100 # Set the number of concurrent connections to create (1, 11, 101, 251, 999, 1000, 1001, ...)
+NUM_CONNECTIONS = 1 # 332 # 999 # 100 # Set the number of concurrent connections to create (1, 11, 101, 251, 999, 1000, 1001, ...)
 
 active_connections = []
 lock = threading.Lock()
@@ -56,21 +57,23 @@ def maintain_connection(index):
             print(f"[✓] Connection {index} established. Total active: {len(active_connections)}")
 
         # Keep the thread alive to maintain the connection
-        while messaging_service.is_connected():
+        while messaging_service.is_connected:
             time.sleep(1)
 
     except Exception as e:
-        #print(f"[✗] Connection {index} failed: {e}")
-        pass
+        print(f"[✗] Connection {index} failed: {e}")
+        #pass
+
+# Set Solace logging level to ERROR to avoid lots of WARNING messages with connect
+logging.getLogger("solace.messaging.core").setLevel(logging.ERROR)
 
 # Launch connections
 threads = []
 
 for i in range(NUM_CONNECTIONS):
-    t = threading.Thread(target=maintain_connection, args=(i + 1,), daemon=True)
-    t.start()
+    t = threading.Thread(target=maintain_connection, args=(i,), daemon=True)
     threads.append(t)
-    time.sleep(0.1)  # slight delay to spread load
+    t.start()
 
 # Monitor thread
 try:
@@ -84,74 +87,32 @@ except KeyboardInterrupt:
 """
 https://solacedotcom.slack.com/archives/C627M1NKA/p1729584577368259
 
+Assign more resources to colima service
+
+colima stop -f
+colima start --cpu 6 --memory 18 --network-address
+
 docker run -d -p 8080:8080 -p 55554:55555 -p 8008:8008 -p 1883:1883 -p 8000:8000 -p 5672:5672 -p 9000:9000 -p 2222:2222 --shm-size=8g --env username_admin_globalaccesslevel=$SOLACE_USER --env username_admin_password=$SOLACE_PASS --env system_scaling_maxconnectioncount=1000 --env system_scaling_maxqueuemessagecount=240 --env system_scaling_maxkafkabridgecount=0 --env system_scaling_maxkafkabrokerconnectioncount=0 --env system_scaling_maxsubscriptioncount=500000  --env messagespool_maxspoolusage=10000 --name=$SOLACE_NAME solace/solace-pubsub-standard
 
 Note the --shm-size value
 
 solace-pubsub-enterprise:latest
 
-Assign more resources to colima service
 
-colima stop -f
-colima start --cpu 6 --memory 14 --network-address
-
-
-[✓] Connection 338 established. Total active: 338
 2025-06-13 16:46:10,038 [WARNING] solace.messaging.core: [_solace_transport.py:89]  [[SERVICE: 0x10816fd90] - [APP ID: ezSolace.local/41741/01520001/0Hc_FB-Lrz]] {'caller_description': 'From service event callback', 'return_code': 'Ok', 'sub_code': 'SOLCLIENT_SUBCODE_COMMUNICATION_ERROR', 'error_info_sub_code': 14, 'error_info_contents': 'TCP connection failure for fd 1022, error = Connection refused (61)'}
 [✓] Connection 339 established. Total active: 339
+
+Suppress warnings by setting logger level
+
 2025-06-13 16:46:10,131 [WARNING] solace.messaging.core: [_solace_session.py:321]  [SolaceApiContext Id: 0x10844cde0] Failed to create solace context
 Caller Description: SolaceApiContext->init. Error Info Sub code: [13]. Error: [Could not create write socket for internal CMD pipe, type 2, protocol 17, error = Unexpected error 0. Caller may not be thread safe]. Sub code: [SOLCLIENT_SUBCODE_OS_ERROR]. Return code: [Fail]
-2025-06-13 16:46:10,236 [WARNING] solace.messaging.core: [_solace_session.py:321]  [SolaceApiContext Id: 0x10844cf30] Failed to create solace context
-Caller Description: SolaceApiContext->init. Error Info Sub code: [13]. Error: [Could not create write socket for internal CMD pipe, type 2, protocol 17, error = Unexpected error 0. Caller may not be thread safe]. Sub code: [SOLCLIENT_SUBCODE_OS_ERROR]. Return code: [Fail]
-2025-06-13 16:46:10,337 [WARNING] solace.messaging.core: [_solace_session.py:321]  [SolaceApiContext Id: 0x10844d010] Failed to create solace context
-Caller Description: SolaceApiContext->init. Error Info Sub code: [13]. Error: [Could not create write socket for internal CMD pipe, type 2, protocol 17, error = Unexpected error 0. Caller may not be thread safe]. Sub code: [SOLCLIENT_SUBCODE_OS_ERROR]. Return code: [Fail]
-2025-06-13 16:46:10,438 [WARNING] solace.messaging.core: [_solace_session.py:321]  [SolaceApiContext Id: 0x10844d0f0] Failed to create solace context
-Caller Description: SolaceApiContext->init. Error Info Sub code: [13]. Error: [Could not create write socket for internal CMD pipe, type 2, protocol 17, error = Unexpected error 0. Caller may not be thread safe]. Sub code: [SOLCLIENT_SUBCODE_OS_ERROR]. Return code: [Fail]
-2025-06-13 16:46:10,538 [WARNING] solace.messaging.core: [_solace_session.py:321]  [SolaceApiContext Id: 0x10844d160] Failed to create solace context
-Caller Description: SolaceApiContext->init. Error Info Sub code: [13]. Error: [Could not create write socket for internal CMD pipe, type 2, protocol 17, error = Unexpected error 0. Caller may not be thread safe]. Sub code: [SOLCLIENT_SUBCODE_OS_ERROR]. Return code: [Fail]
-2025-06-13 16:46:10,641 [WARNING] solace.messaging.core: [_solace_session.py:321]  [SolaceApiContext Id: 0x10844d080] Failed to create solace context
 
-TODO: switch to proper thread isolation see below code
+'Solve' FDs issue by running multiple instances of Python script
 
-reate one MessagingService per thread
-If you're creating multiple connections concurrently, ensure that each thread:
+2025-06-14 13:14:42,833 [WARNING] solace.messaging.connections: [messaging_service.py:1262]  [[SERVICE: 0x110944d50] - [APP ID: ezSolace.local/10265/01320001/NdCngUOWiw]] Connection failed. Status code: -1
+[✗] Connection 306 failed: {'caller_description': 'do_connect', 'return_code': 'Fail', 'sub_code': 'SOLCLIENT_SUBCODE_OUT_OF_RESOURCES', 'error_info_sub_code': 5, 'error_info_contents': 'Too many FDs opened for events for context 306, fd# = 1025'}
 
-Builds its own MessagingService
+Going to/over 1000 connections by running multiple instances of script, e.g. three with 332-333 connections crashes broker and container and colima
+Runs stable up to 998 (includes one internal connection), nummer 999 connects but then everythign goes down.
 
-Connects in isolation
-
-Don't share the same MessagingService or API objects across threads.
-
-Here’s a thread-safe pattern using threading:
-
-python
-Copy
-Edit
-import threading
-from solace.messaging.messaging_service import MessagingService
-
-def connect_to_solace(client_id):
-    props = {
-        "solace.messaging.transport.host": "tcp://localhost:55555",
-        "solace.messaging.service.vpn-name": "default",
-        "solace.messaging.authentication.scheme.basic.username": "user",
-        "solace.messaging.authentication.scheme.basic.password": "pass",
-        "solace.messaging.transport.reconnect-retry-wait": "3000"
-    }
-
-    messaging_service = MessagingService.builder().from_properties(props).build()
-    try:
-        messaging_service.connect()
-        print(f"[{client_id}] Connected successfully.")
-    except Exception as e:
-        print(f"[{client_id}] Connection failed: {e}")
-
-threads = []
-for i in range(5):  # Create 5 concurrent connections safely
-    t = threading.Thread(target=connect_to_solace, args=(f"client-{i}",))
-    threads.append(t)
-    t.start()
-
-for t in threads:
-    t.join()
 """
