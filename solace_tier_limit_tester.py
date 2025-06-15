@@ -2,6 +2,7 @@ import threading
 import time
 import os
 import logging
+import sys
 # solace
 from solace.messaging.messaging_service import MessagingService, RetryStrategy
 from solace.messaging.config.transport_security_strategy import TLS
@@ -18,8 +19,12 @@ SOLACE_TRUSTSTORE_PEM = os.environ["SOLACE_TRUSTSTORE_PEM"]
 
 SOLACE_TCP_PROTOCOL = os.environ["SOLACE_TCP_PROTOCOL"]
 
-NUM_CONNECTIONS = 1 # 332 # 999 # 100 # Set the number of concurrent connections to create (1, 11, 101, 251, 999, 1000, 1001, ...)
-
+args = sys.argv[1:]  # skip the script name
+# print(f"Received arguments: {args}")
+# for arg in args:
+#     print(f"Processing argument: {arg}")
+# Set the number of concurrent connections to create (1, 11, 101, 251, 999, 1000, 1001, ...) defaults to 10
+NUM_CONNECTIONS = int(sys.argv[1]) if len(sys.argv) > 1 and sys.argv[1].isdigit() else 10
 active_connections = []
 lock = threading.Lock()
 
@@ -73,6 +78,8 @@ threads = []
 for i in range(NUM_CONNECTIONS):
     t = threading.Thread(target=maintain_connection, args=(i,), daemon=True)
     threads.append(t)
+    sleepytime = float(sys.argv[2]) if len(sys.argv) > 2 and sys.argv[2].isdigit() else .1
+    time.sleep(sleepytime)
     t.start()
 
 # Monitor thread
@@ -115,4 +122,5 @@ Caller Description: SolaceApiContext->init. Error Info Sub code: [13]. Error: [C
 Going to/over 1000 connections by running multiple instances of script, e.g. three with 332-333 connections crashes broker and container and colima
 Runs stable up to 998 (includes one internal connection), nummer 999 connects but then everythign goes down.
 
+When running in iTerm2 check ulimit, apparently set to 256 default. Set with ulimit -n 65535
 """

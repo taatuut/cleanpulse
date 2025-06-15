@@ -3,8 +3,12 @@
 # leave out #!/bin/bash
 
 # Prepare environment
-
-echo "Set environment variables"
+# Check file .env exists else exit
+if [ ! -f .env ]; then
+    echo "File .env not found!" >&2
+    exit 1
+fi
+# Set environment variables
 source .env
 #printenv
 
