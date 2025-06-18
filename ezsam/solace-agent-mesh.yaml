@@ -77,10 +77,13 @@ solace_agent_mesh:
               # AWS credentials
               aws_access_key_id: # You can also use profiles instead, check boto3 documentation
               aws_secret_access_key:
-          # If using a custom module, add a key here with your Module name (type)
-          # It must also have a module_path key with the path to the module
-          # For example, for type=MyCustomModule, you would add:
-          # MyCustomModule:
-          #   module_path: path/to/module
-          #   custom_key: value
-
+  plugins:
+  - name: sam_graph_database
+    load_unspecified_files: false
+    includes_gateway_interface: false
+    load:
+      agents: []
+      gateways: []
+      overwrites: []
+    from_url: 
+      git+https://github.com/taatuut/solace-agent-mesh-core-plugins#subdirectory=sam-graph-database

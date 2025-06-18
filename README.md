@@ -65,43 +65,13 @@ python3 -m pip install requests lxml solace-pubsubplus pyyaml pandas scikit-lear
 
 ### Solace Agent Mesh - SAM
 
-Run `solace-agent-mesh --version` to verify your SAM installation. Will respond with something like `solace-agent-mesh, version 0.2.3`.
+Ensure you are in the Solace Agent Mesh folder in the repo `cd ezsam`.
 
-Create SAM project folder and go there with `mkdir -p ezsam && cd ezsam && touch .empty`.
+See appendix SAM for installation verification and configuration.
 
-Run `solace-agent-mesh init` and follow the prompts to create your project.
+Now add the required plugin(s) to your SAM project.
 
-In the web interface select [ Get Started Quickly ] and click [ Next ]
-
-In next screen enter details as below and click [ Next ]
-
-```
-OpenAI Compatible Provider
-https://lite-llm.mymaas.net/
-<LiteLLM_API_key>
-azure-gpt-4o
-```
-
-Output will look something like:
-
-```
-solace-agent-mesh init
-Initializing Solace Agent Mesh
-Would you like to configure your project through a web interface in your browser? [Y/n]: 
-Step 1 of 1: Initilize in web
-Web configuration portal is running at http://127.0.0.1:5002
-Complete the configuration in your browser to continue...
-Configuration received from portal
-Project files have been created.
-Created the following gateway template files:
-  - ./configs/gateways/rest_api/rest-api.yaml
-  - ./configs/gateways/rest_api/gateway.yaml
-Solace Agent Mesh has been initialized
-Review the `solace-agent-mesh` config file and make any necessary changes.
-To get started, use the `solace-agent-mesh add` command to add agents and gateways
-```
-
-Now add the SQL Database plugin to your SAM project:
+#### SQL Database plugin
 
 ```
 solace-agent-mesh plugin add sam_sql_database --pip -u git+https://github.com/SolaceLabs/solace-agent-mesh-core-plugins#subdirectory=sam-sql-database
@@ -140,7 +110,75 @@ sam add agent energy_usage_info --copy-from sam_sql_database:sql_database
 Copied agent 'energy_usage_info' from plugin 'sam_sql_database' at: ./configs/agents
 ```
 
-To build and start the Solace Agent Mesh service, run `sam run -b`. You can use `sam` as a shorthand for `solace-agent-mesh` in all commands. See appendix for output.
+The SQL Database agent requires that you configure several environment variables. You must create or update your `.env` file with the following variables for this tutorial:
+
+```
+ENERGY_USAGE_INFO_DB_TYPE=sqlite
+ENERGY_USAGE_INFO_DB_NAME=../shared.db
+ENERGY_USAGE_INFO_DB_PURPOSE="Dummython operations and cleaning database"
+ENERGY_USAGE_INFO_DB_DESCRIPTION="Contains information about Dummython machine operations and cleaning requirements and metrics for multiple buildings at various plants."
+ENERGY_USAGE_INFOSQL_DB_PORT=
+ENERGY_USAGE_INFO_DB_HOST=
+ENERGY_USAGE_INFO_DB_PASSWORD=
+ENERGY_USAGE_INFO_DB_USER=
+```
+
+#### Graph Database plugin
+
+```
+solace-agent-mesh plugin add sam_graph_database --pip -u git+https://github.com/taatuut/solace-agent-mesh-core-plugins#subdirectory=sam-graph-database
+
+Module 'sam_graph_database' not found. Attempting to install 'git+https://github.com/taatuut/solace-agent-mesh-core-plugins#subdirectory=sam-graph-database' using pip...
+Collecting git+https://github.com/taatuut/solace-agent-mesh-core-plugins#subdirectory=sam-graph-database
+  Cloning https://github.com/taatuut/solace-agent-mesh-core-plugins to /private/var/folders/f5/dymfy2kx71l1wqwygnkz4fw40000gn/T/pip-req-build-dnozntgi
+  Running command git clone --filter=blob:none --quiet https://github.com/taatuut/solace-agent-mesh-core-plugins /private/var/folders/f5/dymfy2kx71l1wqwygnkz4fw40000gn/T/pip-req-build-dnozntgi
+  Resolved https://github.com/taatuut/solace-agent-mesh-core-plugins to commit 24ad174574b013680769e81083a5af22aac88edf
+  Installing build dependencies ... done
+  Getting requirements to build wheel ... done
+  Preparing metadata (pyproject.toml) ... done
+Requirement already satisfied: neo4j>=5.28.1 in /Users/emilzegers/.venv/lib/python3.13/site-packages (from sam-graph-database==0.0.1) (5.28.1)
+Requirement already satisfied: pytz in /Users/emilzegers/.venv/lib/python3.13/site-packages (from neo4j>=5.28.1->sam-graph-database==0.0.1) (2025.2)
+Building wheels for collected packages: sam-graph-database
+  Building wheel for sam-graph-database (pyproject.toml) ... done
+  Created wheel for sam-graph-database: filename=sam_graph_database-0.0.1-py3-none-any.whl size=19817 sha256=dd3f6dc8819519cbfb8c2d9859395b3cb66db4f2f82ccb856b7632b545a909b4
+  Stored in directory: /private/var/folders/f5/dymfy2kx71l1wqwygnkz4fw40000gn/T/pip-ephem-wheel-cache-anprp45c/wheels/9c/77/0b/748451078a40f735da8f3e60a2090636d560bb87b3610f2123
+Successfully built sam-graph-database
+Installing collected packages: sam-graph-database
+Successfully installed sam-graph-database-0.0.1
+Successfully added plugin 'sam_graph_database'.
+```
+
+Then create an agent instance based on the Graph database template:
+
+```
+sam add agent cleaning_metrics_info --copy-from sam_graph_database:graph_database
+
+Copied agent 'cleaning_metrics_info' from plugin 'sam_graph_database' at: ./configs/agents
+```
+
+TODO document remove/reinstall
+
+```
+sam plugin remove sam_graph_database
+python3 -m pip uninstall sam_graph_database
+```
+
+The Graph Database agent requires that you configure several environment variables. You must create or update your `.env` file with the following variables for this tutorial:
+
+```
+CLEANING_METRICS_INFOSQL_DB_PORT=
+CLEANING_METRICS_INFO_DB_DESCRIPTION=
+CLEANING_METRICS_INFO_DB_HOST=
+CLEANING_METRICS_INFO_DB_NAME=
+CLEANING_METRICS_INFO_DB_PASSWORD=
+CLEANING_METRICS_INFO_DB_PURPOSE=
+CLEANING_METRICS_INFO_DB_TYPE=
+CLEANING_METRICS_INFO_DB_USER=
+```
+
+#### Run SAM
+
+To build and start the Solace Agent Mesh service, run `sam run -b`. See appendix for output.
 
 Go to the interface (http://localhost:5001/) and ask the following questions, 1-3 are for verficiation.
 
@@ -166,6 +204,10 @@ Based on analysis of a combined ranking of the metrics for the levels of dust, s
 The dummython company now is AI enabled. The AI agent determines Top 3 of machines that need to be cleaned and predicts number of minutes needed, so you can calculate impact on production/revenue.
 Use the analysis to predict which machines are likely to have the highest need for cleaning maintenance resources taking costs for energy, detergent, labour and revenue loss due to production impact into account.
 Return this predictive maintenance schedule as a nicely styled reported written for plant managers including an schedule for cleaning for the coming week for machine operators.
+
+5.
+Create an overall audit report of TODO
+Use template TODO
 
 ### Neo4j
 Install Neo4j using `brew install neo4j`, this icnludes `cypher-shell` cli for neo4j and `openjdk@21`, see Appendix Neo4j.
@@ -590,6 +632,44 @@ DETACH DELETE n
 NOTE: could run Neo4j in a container to make this a system independent component.
 
 ### Appendix SAM
+
+Run `solace-agent-mesh --version` to verify your SAM installation (or short `sam --version`, you can use `sam` as a shorthand for `solace-agent-mesh` in all commands). Will respond with something like `solace-agent-mesh, version 0.2.4`.
+ 
+Create SAM project folder and go there with `mkdir -p ezsam && cd ezsam && touch .empty`.
+
+Run `solace-agent-mesh init` and follow the prompts to create your project.
+
+In the web interface select [ Get Started Quickly ] and click [ Next ]
+
+In next screen enter details as below and click [ Next ]
+
+```
+OpenAI Compatible Provider
+https://lite-llm.mymaas.net/
+<LiteLLM_API_key>
+azure-gpt-4o
+```
+
+Output will look something like:
+
+```
+solace-agent-mesh init
+Initializing Solace Agent Mesh
+Would you like to configure your project through a web interface in your browser? [Y/n]: 
+Step 1 of 1: Initilize in web
+Web configuration portal is running at http://127.0.0.1:5002
+Complete the configuration in your browser to continue...
+Configuration received from portal
+Project files have been created.
+Created the following gateway template files:
+  - ./configs/gateways/rest_api/rest-api.yaml
+  - ./configs/gateways/rest_api/gateway.yaml
+Solace Agent Mesh has been initialized
+Review the `solace-agent-mesh` config file and make any necessary changes.
+To get started, use the `solace-agent-mesh add` command to add agents and gateways
+```
+
+Running SAM
 
 ```
 sam run -b
