@@ -73,6 +73,8 @@ Now add the required plugin(s) to your SAM project.
 
 #### SQL Database plugin
 
+See https://solacelabs.github.io/solace-agent-mesh/docs/documentation/tutorials/sql-database/
+
 ```
 solace-agent-mesh plugin add sam_sql_database --pip -u git+https://github.com/SolaceLabs/solace-agent-mesh-core-plugins#subdirectory=sam-sql-database
 
@@ -130,21 +132,21 @@ solace-agent-mesh plugin add sam_graph_database --pip -u git+https://github.com/
 
 Module 'sam_graph_database' not found. Attempting to install 'git+https://github.com/taatuut/solace-agent-mesh-core-plugins#subdirectory=sam-graph-database' using pip...
 Collecting git+https://github.com/taatuut/solace-agent-mesh-core-plugins#subdirectory=sam-graph-database
-  Cloning https://github.com/taatuut/solace-agent-mesh-core-plugins to /private/var/folders/f5/dymfy2kx71l1wqwygnkz4fw40000gn/T/pip-req-build-dnozntgi
-  Running command git clone --filter=blob:none --quiet https://github.com/taatuut/solace-agent-mesh-core-plugins /private/var/folders/f5/dymfy2kx71l1wqwygnkz4fw40000gn/T/pip-req-build-dnozntgi
-  Resolved https://github.com/taatuut/solace-agent-mesh-core-plugins to commit 24ad174574b013680769e81083a5af22aac88edf
+  Cloning https://github.com/taatuut/solace-agent-mesh-core-plugins to /private/var/folders/f5/dymfy2kx71l1wqwygnkz4fw40000gn/T/pip-req-build-q88o9qjw
+  Running command git clone --filter=blob:none --quiet https://github.com/taatuut/solace-agent-mesh-core-plugins /private/var/folders/f5/dymfy2kx71l1wqwygnkz4fw40000gn/T/pip-req-build-q88o9qjw
+  Resolved https://github.com/taatuut/solace-agent-mesh-core-plugins to commit 0c69328393585337c3bd98ba1110c990a76a179a
   Installing build dependencies ... done
   Getting requirements to build wheel ... done
   Preparing metadata (pyproject.toml) ... done
-Requirement already satisfied: neo4j>=5.28.1 in /Users/emilzegers/.venv/lib/python3.13/site-packages (from sam-graph-database==0.0.1) (5.28.1)
-Requirement already satisfied: pytz in /Users/emilzegers/.venv/lib/python3.13/site-packages (from neo4j>=5.28.1->sam-graph-database==0.0.1) (2025.2)
-Building wheels for collected packages: sam-graph-database
-  Building wheel for sam-graph-database (pyproject.toml) ... done
-  Created wheel for sam-graph-database: filename=sam_graph_database-0.0.1-py3-none-any.whl size=19817 sha256=dd3f6dc8819519cbfb8c2d9859395b3cb66db4f2f82ccb856b7632b545a909b4
-  Stored in directory: /private/var/folders/f5/dymfy2kx71l1wqwygnkz4fw40000gn/T/pip-ephem-wheel-cache-anprp45c/wheels/9c/77/0b/748451078a40f735da8f3e60a2090636d560bb87b3610f2123
-Successfully built sam-graph-database
-Installing collected packages: sam-graph-database
-Successfully installed sam-graph-database-0.0.1
+Requirement already satisfied: neo4j>=5.28.1 in /Users/emilzegers/.venv/lib/python3.13/site-packages (from sam_graph_database==0.0.1) (5.28.1)
+Requirement already satisfied: pytz in /Users/emilzegers/.venv/lib/python3.13/site-packages (from neo4j>=5.28.1->sam_graph_database==0.0.1) (2025.2)
+Building wheels for collected packages: sam_graph_database
+  Building wheel for sam_graph_database (pyproject.toml) ... done
+  Created wheel for sam_graph_database: filename=sam_graph_database-0.0.1-py3-none-any.whl size=19931 sha256=2b8429ab71cb2a30c75064e8570706c23e54d41576b48baeefc395d3512edfb9
+  Stored in directory: /private/var/folders/f5/dymfy2kx71l1wqwygnkz4fw40000gn/T/pip-ephem-wheel-cache-3d7214gp/wheels/9c/77/0b/748451078a40f735da8f3e60a2090636d560bb87b3610f2123
+Successfully built sam_graph_database
+Installing collected packages: sam_graph_database
+Successfully installed sam_graph_database-0.0.1
 Successfully added plugin 'sam_graph_database'.
 ```
 
@@ -154,13 +156,6 @@ Then create an agent instance based on the Graph database template:
 sam add agent cleaning_metrics_info --copy-from sam_graph_database:graph_database
 
 Copied agent 'cleaning_metrics_info' from plugin 'sam_graph_database' at: ./configs/agents
-```
-
-TODO document remove/reinstall
-
-```
-sam plugin remove sam_graph_database
-python3 -m pip uninstall sam_graph_database
 ```
 
 The Graph Database agent requires that you configure several environment variables. You must create or update your `.env` file with the following variables for this tutorial:
@@ -175,6 +170,17 @@ CLEANING_METRICS_INFO_DB_PURPOSE=
 CLEANING_METRICS_INFO_DB_TYPE=
 CLEANING_METRICS_INFO_DB_USER=
 ```
+
+To remove a plugin:
+
+```
+sam plugin remove sam_graph_database
+python3 -m pip uninstall sam_graph_database
+```
+
+Onelliner to reinstall:
+
+`clear && sam plugin remove sam_graph_database && python3 -m pip uninstall -y sam_graph_database && solace-agent-mesh plugin add sam_graph_database --pip -u git+https://github.com/taatuut/solace-agent-mesh-core-plugins#subdirectory=sam-graph-database && sam add agent cleaning_metrics_info --copy-from sam_graph_database:graph_database && sam run -b`
 
 #### Run SAM
 
@@ -478,14 +484,11 @@ Source: https://docs.solace.com/API/API-Developer-Guide-Python/Python-API-Distri
 
 ## Next steps
 1.
-https://solacelabs.github.io/solace-agent-mesh/docs/documentation/tutorials/sql-database/
-
-2.
 Explore Message Transformation Approach using connector.
 
 https://docs.solace.com/API/Connectors/Self-Contained-Connectors/Message-Processor/Message-Processor-Overview.htm
 
-3.
+2.
 Observability Log fowarding, Insights monitoring, Distributed Tracing OpenTelemetry
 
 ## Appendices
