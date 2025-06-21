@@ -180,7 +180,7 @@ python3 -m pip uninstall sam_graph_database
 
 Onelliner to reinstall:
 
-`clear && sam plugin remove sam_graph_database && python3 -m pip uninstall -y sam_graph_database && solace-agent-mesh plugin add sam_graph_database --pip -u git+https://github.com/taatuut/solace-agent-mesh-core-plugins#subdirectory=sam-graph-database && sam add agent cleaning_metrics_info --copy-from sam_graph_database:graph_database && sam run -b`
+`% clear && printf '\n%.0s' {1..50} && sam plugin remove sam_graph_database && python3 -m pip uninstall -y sam_graph_database && solace-agent-mesh plugin add sam_graph_database --pip -u git+https://github.com/taatuut/solace-agent-mesh-core-plugins#subdirectory=sam-graph-database && sam add agent cleaning_metrics_info --copy-from sam_graph_database:graph_database && sam run -b`
 
 #### Run SAM
 
