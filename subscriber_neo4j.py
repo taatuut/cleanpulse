@@ -140,8 +140,8 @@ if __name__ == "__main__":
             self.processor_func(message)
 
     try:
-        # Create queue receiver
-        QUEUE_NAME = 'CUSTOM-QNAME-neo4j-json' # TODO: get from config
+        # Create queue receiver using hardcoded queue name from config.json
+        QUEUE_NAME = 'CUSTOM-QNAME-neo4j-json'
         queue = Queue.durable_exclusive_queue(QUEUE_NAME) 
         receiver = messaging_service.create_persistent_message_receiver_builder().build(queue)
         receiver.start()

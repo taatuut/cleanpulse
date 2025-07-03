@@ -1,10 +1,13 @@
-# clean clean, always clean
-"Real-time insights for spotless performance". An application that focuses on reporting the cleaning activities of machines in a factory, including details such as the last cleaning time, duration, water usage, and energy usage. Relevant for CPG industry, like beer breweries and coffee-roasting factories.
+# Clean, clean, always clean
+"Real-time insights for spotless performance". An application that focuses on reporting about industrial cleaning activities of machines in a factory, including details such as the last cleaning time, duration, water usage, and energy usage. Relevant for the food and beverage industry, like breweries, coffee-roasting factories.
 
-## what we are aiming for
+## Purpose
 Real-time information into a high-tech industrial control room with multiple digital dashboards showing live data feeds. One dashboard highlights real-time cleaning activities of robotic and automated machines in a brewery and factory. Screens display animated timelines, sensor graphs, heatmaps of machine cleanliness, and event logs. Overlaid holographic UI elements show Solace PubSub+ messaging icons, AI analytics charts, and alerts. In the background, factory floors and brewing tanks are visible through glass walls, with autonomous cleaning robots in action. "Powered by CleanPulse AI".
 
-## context of the demo
+## Context
+This demo is about real-time AI manufacturing support in the food and beverage consumer goods industry.
+It is developed on macOS using Python (3.10.6+) and Colima. Some terminal commands need to be adjusted to run on Linux or Windows. 
+
 Components:
 1. Solace Event Broker: To facilitate real-time event streaming and message routing.
 2. Solace Micro Integration Component: For integrating energy consumption from machines and processing events.
@@ -18,19 +21,7 @@ Components:
 * Analytics: An analytics engine can be used to generate insights and reports on cleaning activities, such as trends in water and energy usage, frequency of cleanings, and compliance with cleaning schedules.
 On the data in sqlite IsolationForest analysis is run periodically to detect outliers. In neo4j relations are created between the individual events showing the overall patterns and phenomenons.
 
-## steps- concept, please add/change
-- create application description and use ai event model wizard to create app with events
-- follow outline at https://feeds.solace.dev/ to create feed (@magali, you had some ideas on topics and payload?)
-- create feed(s) would be nice if these are semirandom so we cabn use ai to detect patterns in there, check if this is possible with feed
-- create event mesh
-- publish feed to mesh
-- add ai agent as subscriber to detect patterns (like 'cleaning at night/weekend is cheaper because of energy cost', 'cleaning on friday uses way more chemicals because too long cleaning interval following Sun-Tue-Fri scheudle', just making these up) 
-- publish or subscribe a analytics / dashboard
-
 ![hitech industrial control room with multiple digital dashboards showing live data feeds featuring real-time cleaning activities](https://github.com/user-attachments/assets/f9e7a312-6471-4631-a278-fd53e49e5218)
-
-## Context
-This demo is developed for Solace SKO FY26 on macOS using Python (3.10.6+) and Colimna. Some terminal commands need to be adjusted to run on Linux or Windows. 
 
 ## Repo
 `git clone https://github.com/taatuut/cleanpulse.git`
@@ -38,9 +29,9 @@ This demo is developed for Solace SKO FY26 on macOS using Python (3.10.6+) and C
 ## Setup
 
 ### Set environment variables
-Check `sample.env` and copy/create `.env` with own values, then run:
+Check `sample.env` and copy/create `.env` with own values, then in a terminal run:
 
-```
+```sh
 source .env
 ```
 
@@ -52,205 +43,86 @@ Create and source a Python virtual environment, this demo use `~/.venv`.
 
 Open a terminal and run:
 
-```
+```sh
 mkdir -p ~/.venv && python3 -m venv ~/.venv && source ~/.venv/bin/activate
 ```
 
 Install Python modules (optional: `upgrade pip`)
 
-```
+```sh
 python3 -m pip install --upgrade pip
-python3 -m pip install requests lxml solace-pubsubplus pyyaml pandas scikit-learn neo4j dash plotly solace-agent-mesh
+python3 -m pip install requests lxml solace-pubsubplus pyyaml pandas scikit-learn neo4j dash plotly solace-agent-mesh sqlite-web
 ```
-
-### Solace Agent Mesh - SAM
-
-Ensure you are in the Solace Agent Mesh folder in the repo `cd ezsam`.
-
-See appendix SAM for installation verification and configuration.
-
-Now add the required plugin(s) to your SAM project.
-
-#### SQL Database plugin
-
-See https://solacelabs.github.io/solace-agent-mesh/docs/documentation/tutorials/sql-database/
-
-```
-solace-agent-mesh plugin add sam_sql_database --pip -u git+https://github.com/SolaceLabs/solace-agent-mesh-core-plugins#subdirectory=sam-sql-database
-
-Module 'sam_sql_database' not found. Attempting to install 'git+https://github.com/SolaceLabs/solace-agent-mesh-core-plugins#subdirectory=sam-sql-database' using pip...
-Collecting git+https://github.com/SolaceLabs/solace-agent-mesh-core-plugins#subdirectory=sam-sql-database
-  Cloning https://github.com/SolaceLabs/solace-agent-mesh-core-plugins to /private/var/folders/f5/dymfy2kx71l1wqwygnkz4fw40000gn/T/pip-req-build-98llfgm2
-  Running command git clone --filter=blob:none --quiet https://github.com/SolaceLabs/solace-agent-mesh-core-plugins /private/var/folders/f5/dymfy2kx71l1wqwygnkz4fw40000gn/T/pip-req-build-98llfgm2
-  Resolved https://github.com/SolaceLabs/solace-agent-mesh-core-plugins to commit da3096ba4103afa0fa399e29f4b2b044bbd49f5c
-  Installing build dependencies ... done
-  Getting requirements to build wheel ... done
-  Preparing metadata (pyproject.toml) ... done
-Collecting mysql-connector-python>=8.3.0 (from sam_sql_database==0.0.1)
-  Using cached mysql_connector_python-9.3.0-cp313-cp313-macosx_14_0_arm64.whl.metadata (7.5 kB)
-Collecting psycopg2-binary>=2.9.9 (from sam_sql_database==0.0.1)
-  Using cached psycopg2_binary-2.9.10-cp313-cp313-macosx_14_0_arm64.whl.metadata (4.9 kB)
-Requirement already satisfied: sqlalchemy>=2.0.25 in /Users/emilzegers/.venv/lib/python3.13/site-packages (from sam_sql_database==0.0.1) (2.0.40)
-Requirement already satisfied: typing-extensions>=4.6.0 in /Users/emilzegers/.venv/lib/python3.13/site-packages (from sqlalchemy>=2.0.25->sam_sql_database==0.0.1) (4.14.0)
-Using cached mysql_connector_python-9.3.0-cp313-cp313-macosx_14_0_arm64.whl (15.2 MB)
-Using cached psycopg2_binary-2.9.10-cp313-cp313-macosx_14_0_arm64.whl (3.3 MB)
-Building wheels for collected packages: sam_sql_database
-  Building wheel for sam_sql_database (pyproject.toml) ... done
-  Created wheel for sam_sql_database: filename=sam_sql_database-0.0.1-py3-none-any.whl size=19297 sha256=050bc62bec55753b807232fe1afa859b3c149a391f3b020935a5cec3ac713445
-  Stored in directory: /private/var/folders/f5/dymfy2kx71l1wqwygnkz4fw40000gn/T/pip-ephem-wheel-cache-s08ku__0/wheels/9c/33/11/590d2ff34c9055bbfa77cedcedd2230315b2f160ff6fb09705
-Successfully built sam_sql_database
-Installing collected packages: psycopg2-binary, mysql-connector-python, sam_sql_database
-Successfully installed mysql-connector-python-9.3.0 psycopg2-binary-2.9.10 sam_sql_database-0.0.1
-Successfully added plugin 'sam_sql_database'.
-```
-
-Then create an agent instance based on the SQL database template:
-
-```
-sam add agent energy_usage_info --copy-from sam_sql_database:sql_database
-
-Copied agent 'energy_usage_info' from plugin 'sam_sql_database' at: ./configs/agents
-```
-
-The SQL Database agent requires that you configure several environment variables. You must create or update your `.env` file with the following variables for this tutorial:
-
-```
-ENERGY_USAGE_INFO_DB_TYPE=sqlite
-ENERGY_USAGE_INFO_DB_NAME=../shared.db
-ENERGY_USAGE_INFO_DB_PURPOSE="Dummython operations and cleaning database"
-ENERGY_USAGE_INFO_DB_DESCRIPTION="Contains information about Dummython machine operations and cleaning requirements and metrics for multiple buildings at various plants."
-ENERGY_USAGE_INFOSQL_DB_PORT=
-ENERGY_USAGE_INFO_DB_HOST=
-ENERGY_USAGE_INFO_DB_PASSWORD=
-ENERGY_USAGE_INFO_DB_USER=
-```
-
-#### Graph Database plugin
-
-```
-solace-agent-mesh plugin add sam_graph_database --pip -u git+https://github.com/taatuut/solace-agent-mesh-core-plugins#subdirectory=sam-graph-database
-
-Module 'sam_graph_database' not found. Attempting to install 'git+https://github.com/taatuut/solace-agent-mesh-core-plugins#subdirectory=sam-graph-database' using pip...
-Collecting git+https://github.com/taatuut/solace-agent-mesh-core-plugins#subdirectory=sam-graph-database
-  Cloning https://github.com/taatuut/solace-agent-mesh-core-plugins to /private/var/folders/f5/dymfy2kx71l1wqwygnkz4fw40000gn/T/pip-req-build-q88o9qjw
-  Running command git clone --filter=blob:none --quiet https://github.com/taatuut/solace-agent-mesh-core-plugins /private/var/folders/f5/dymfy2kx71l1wqwygnkz4fw40000gn/T/pip-req-build-q88o9qjw
-  Resolved https://github.com/taatuut/solace-agent-mesh-core-plugins to commit 0c69328393585337c3bd98ba1110c990a76a179a
-  Installing build dependencies ... done
-  Getting requirements to build wheel ... done
-  Preparing metadata (pyproject.toml) ... done
-Requirement already satisfied: neo4j>=5.28.1 in /Users/emilzegers/.venv/lib/python3.13/site-packages (from sam_graph_database==0.0.1) (5.28.1)
-Requirement already satisfied: pytz in /Users/emilzegers/.venv/lib/python3.13/site-packages (from neo4j>=5.28.1->sam_graph_database==0.0.1) (2025.2)
-Building wheels for collected packages: sam_graph_database
-  Building wheel for sam_graph_database (pyproject.toml) ... done
-  Created wheel for sam_graph_database: filename=sam_graph_database-0.0.1-py3-none-any.whl size=19931 sha256=2b8429ab71cb2a30c75064e8570706c23e54d41576b48baeefc395d3512edfb9
-  Stored in directory: /private/var/folders/f5/dymfy2kx71l1wqwygnkz4fw40000gn/T/pip-ephem-wheel-cache-3d7214gp/wheels/9c/77/0b/748451078a40f735da8f3e60a2090636d560bb87b3610f2123
-Successfully built sam_graph_database
-Installing collected packages: sam_graph_database
-Successfully installed sam_graph_database-0.0.1
-Successfully added plugin 'sam_graph_database'.
-```
-
-Then create an agent instance based on the Graph database template:
-
-```
-sam add agent cleaning_metrics_info --copy-from sam_graph_database:graph_database
-
-Copied agent 'cleaning_metrics_info' from plugin 'sam_graph_database' at: ./configs/agents
-```
-
-The Graph Database agent requires that you configure several environment variables. You must create or update your `.env` file with the following variables for this tutorial:
-
-```
-CLEANING_METRICS_INFOSQL_DB_PORT=
-CLEANING_METRICS_INFO_DB_DESCRIPTION=
-CLEANING_METRICS_INFO_DB_HOST=
-CLEANING_METRICS_INFO_DB_NAME=
-CLEANING_METRICS_INFO_DB_PASSWORD=
-CLEANING_METRICS_INFO_DB_PURPOSE=
-CLEANING_METRICS_INFO_DB_TYPE=
-CLEANING_METRICS_INFO_DB_USER=
-```
-
-To remove a plugin:
-
-```
-sam plugin remove sam_graph_database
-python3 -m pip uninstall sam_graph_database
-```
-
-Onelliner to reinstall:
-
-`% clear && printf '\n%.0s' {1..50} && sam plugin remove sam_graph_database && python3 -m pip uninstall -y sam_graph_database && solace-agent-mesh plugin add sam_graph_database --pip -u git+https://github.com/taatuut/solace-agent-mesh-core-plugins#subdirectory=sam-graph-database && sam add agent cleaning_metrics_info --copy-from sam_graph_database:graph_database && sam run -b`
-
-#### Run SAM
-
-To build and start the Solace Agent Mesh service, run `sam run -b`. See appendix for output.
-
-Go to the interface (http://localhost:5001/) and ask the following questions, 1-3 are for verficiation.
-
-1.
-How many plants does Dummython company has?
-
-2.
-Create a table summarizing number of machine per building per plant for company Dummython. 
-
-3.
-What is the total number of machines at Dummython company.
-
-4.
-CURL
-Based on analysis of a combined ranking of the metrics for the levels of dust, sticky stuff and odor at the machines, using the representing values in columns sri, dli and odi, determine top 3 of machines for all buildings and plants that need to be stopped for cleaning maintenance and create a curl POST request command to send the machine ids, and the estimated number of minutes the cleaning will take in json format to http://localhost:54322/ Provide the complete curl command as response.
-
-POST
-Based on analysis of a combined ranking of the metrics for the levels of dust, sticky stuff and odor at the machines, using the representing values in columns sri, dli and odi, determine top 3 of machines for all buildings and plants that need to be stopped for cleaning maintenance and create a POST request command to send the machine ids, and the estimated number of minutes the cleaning will take in json format to http://localhost:54322/ Do send the command and also provide the used command as response.
-
-GET
-Based on analysis of a combined ranking of the metrics for the levels of dust, sticky stuff and odor at the machines, using the representing values in columns sri, dli and odi, determine top 3 of machines for all buildings and plants that need to be stopped for cleaning maintenance and create a GET request command to send the machine ids, and the estimated number of minutes the cleaning will take as a url query string to http://localhost:54322/ Send the request and in the response provide the used request.
-
-The dummython company now is AI enabled. The AI agent determines Top 3 of machines that need to be cleaned and predicts number of minutes needed, so you can calculate impact on production/revenue.
-Use the analysis to predict which machines are likely to have the highest need for cleaning maintenance resources taking costs for energy, detergent, labour and revenue loss due to production impact into account.
-Return this predictive maintenance schedule as a nicely styled reported written for plant managers including an schedule for cleaning for the coming week for machine operators.
-
-5.
-Create an overall audit report of TODO
-Use template TODO
-
-### Neo4j
-Install Neo4j using `brew install neo4j`, this icnludes `cypher-shell` cli for neo4j and `openjdk@21`, see Appendix Neo4j.
 
 ## Run
 Make sure shell scripts are executable
 
-```bash
+```sh
 chmod +x **/*.sh
 ```
 
 In first terminal clean and prepare environment run:
 
-```bash
+```sh
 ./PrepareEnvironment.sh
 ```
 
 Responds with something like:
 
-```bash
+```sh
+./PrepareEnvironment.sh
+Remove Solace event broker docker container cleanpulse
+cleanpulse
+Create Solace event broker docker container cleanpulse
+47496838d1408169bffd5d584c7124ba41bc5773dd1c371a46f2e961d8df8e81
+Configure Solace event broker
+Waiting for service to be ready... (1)
+.
+.
+.
+Waiting for service to be ready... (23)
+Queue 'CUSTOM-QNAME-cleanpulse-json' does not exist. Creating...
+Queue 'CUSTOM-QNAME-cleanpulse-json' created successfully.
+Subscription 'cleanpulse/messages/json/>' added to queue 'CUSTOM-QNAME-cleanpulse-json'.
+Subscription 'test/some/value' added to queue 'CUSTOM-QNAME-cleanpulse-json'.
+Queue 'CUSTOM-QNAME-neo4j-json' does not exist. Creating...
+Queue 'CUSTOM-QNAME-neo4j-json' created successfully.
+Subscription 'cleanpulse/messages/json/>' added to queue 'CUSTOM-QNAME-neo4j-json'.
+Queue 'CUSTOM-QNAME-sqlite-json' does not exist. Creating...
+Queue 'CUSTOM-QNAME-sqlite-json' created successfully.
+Subscription 'cleanpulse/messages/json/>' added to queue 'CUSTOM-QNAME-sqlite-json'.
+Queue 'CUSTOM-QNAME-sqlite-json' already exists.
+Adding missing subscription 'cleanpulse/notifications/>'...
+Subscription 'cleanpulse/notifications/>' added to queue 'CUSTOM-QNAME-sqlite-json'.
+Queue 'CUSTOM-QNAME-cleanpulse-xml' does not exist. Creating...
+Queue 'CUSTOM-QNAME-cleanpulse-xml' created successfully.
+Subscription 'cleanpulse/messages/xml/>' added to queue 'CUSTOM-QNAME-cleanpulse-xml'.
+Subscription 'test/another/value' added to queue 'CUSTOM-QNAME-cleanpulse-xml'.
+Queue 'CUSTOM-QNAME-test' does not exist. Creating...
+Queue 'CUSTOM-QNAME-test' created successfully.
+Subscription 'test/>' added to queue 'CUSTOM-QNAME-test'.
+Done.
+Clean out Neo4j
 0 rows
-ready to start consuming query after 64 ms, results consumed after another 0 ms
-Deleted 2495 nodes, Deleted 8186 relationships
+ready to start consuming query after 41 ms, results consumed after another 0 ms
 +----------------------------------------------------+
 | value                                              |
 +----------------------------------------------------+
-| "Query caches successfully cleared of 15 queries." |
+| "Query caches successfully cleared of 13 queries." |
 +----------------------------------------------------+
 
 1 row
-ready to start consuming query after 12 ms, results consumed after another 2 ms
+ready to start consuming query after 8 ms, results consumed after another 3 ms
 0 rows
-ready to start consuming query after 8 ms, results consumed after another 0 ms
+ready to start consuming query after 3 ms, results consumed after another 0 ms
 0 rows
-ready to start consuming query after 6 ms, results consumed after another 0 ms
-removed transactions files
-removed output files
+ready to start consuming query after 3 ms, results consumed after another 0 ms
+Removed transactions files
+Recreated transactions folder
+Removed output files
+Recreated output folder
+Removed SQLite databasde
+Removed ezsam log and trace files
 ```
 
 ## Publishing
@@ -258,37 +130,15 @@ To run a Solace broker use Solace PubSub+ Cloud platform or a local Solace event
 
 This demo assumes using a local broker but configuration settings can be changed to work with a cloud broker too.
 
-Step 1 and 2 are also included in the `PrepareEnvironment.sh` shell script.
+NOTE: Step 1 and 2 are included in the `PrepareEnvironment.sh` shell script.
 
 1. To run a Solace PubSub+ Event Broker container image run the following command. Note that the usage of environment variables assumes these are sourced before, also on Mac OS port 55555 must be mapped to 55554 as this is a reserved port since MacOS Big Sur.
 
-```
+```sh
 docker run -d -p 8080:8080 -p 55554:55555 -p 8008:8008 -p 1883:1883 -p 8000:8000 -p 5672:5672 -p 9000:9000 -p 2222:2222 --shm-size=2g --env username_admin_globalaccesslevel=$SOLACE_USER --env username_admin_password=$SOLACE_PASS --name=$SOLACE_NAME solace/solace-pubsub-standard
 ```
 
 2. To configure the Solace broker in the same or a new terminal run `python3 ez_broker_configuration.py`. This creates the required queue with topic subscription if not existing and will outoput something like below. Then check Broker management / Messaging / Queues for information on the configured queue.
-
-```
-python3 ez_broker_configuration.py
-Queue 'CUSTOM-QNAME-dummython-json' does not exist. Creating...
-Queue 'CUSTOM-QNAME-dummython-json' created successfully.
-Subscription 'dummython/messages/json/>' added to queue 'CUSTOM-QNAME-dummython-json'.
-Subscription 'test/some/value' added to queue 'CUSTOM-QNAME-dummython-json'.
-Queue 'CUSTOM-QNAME-neo4j-json' does not exist. Creating...
-Queue 'CUSTOM-QNAME-neo4j-json' created successfully.
-Subscription 'dummython/messages/json/>' added to queue 'CUSTOM-QNAME-neo4j-json'.
-Queue 'CUSTOM-QNAME-sqlite-json' does not exist. Creating...
-Queue 'CUSTOM-QNAME-sqlite-json' created successfully.
-Subscription 'dummython/messages/json/>' added to queue 'CUSTOM-QNAME-sqlite-json'.
-Queue 'CUSTOM-QNAME-dummython-xml' does not exist. Creating...
-Queue 'CUSTOM-QNAME-dummython-xml' created successfully.
-Subscription 'dummython/messages/xml/>' added to queue 'CUSTOM-QNAME-dummython-xml'.
-Subscription 'test/another/value' added to queue 'CUSTOM-QNAME-dummython-xml'.
-Queue 'CUSTOM-QNAME-test' does not exist. Creating...
-Queue 'CUSTOM-QNAME-test' created successfully.
-Subscription 'test/>' added to queue 'CUSTOM-QNAME-test'.
-Done.
-```
 
 Now open the Solace PubSub+ Event Broker management console at http://localhost:8080/ to check the configuration. 
 
@@ -317,20 +167,20 @@ python3 subscriber_neo4j.py
 
 ```
 python3 subscriber_sqlite.py
-[2025-06-11 21:20:11] - SQLite database running
+[2025-06-11 21:20:11] - SQLite database running, SQLite Web browser at  at http://localhost:8191
 [2025-06-11 21:20:11] Connect to Solace broker...
 [2025-06-11 21:20:11]
 [2025-06-11 21:20:11] Receiver is running. Press Ctrl+C to stop.
 ```
 
-6. Open another terminal to send messages from. Make sure environment variables are available by running `source .env` and virtual environment is activated (run `source ~/.venv/bin/activate`). The messages are sent in two ways:
+6. Open a fifth terminal to send messages from. Make sure environment variables are available by running `source .env` and virtual environment is activated (run `source ~/.venv/bin/activate`). The messages are sent in two ways:
 
 - directly to the Solace PubSub+ broker REST API, and 
 - to the gateway started in the previous step: the gateway processes the message (conversion from XML to json, setting dynamic topic) and then sends it to the Solace PubSub+ broker using SMF protocol.
 
 Run `python3 ez_machine.py`, in this script you can set a sleep value to only send a message at certain interval.
 
-7. In a last terminal run the live dashboard with `python3 dashboard.py`
+7. In a sixth terminal run the live dashboard with `python3 dashboard.py`
 
 ```
 python3 dashboard.py
@@ -339,6 +189,46 @@ Dash is running on http://127.0.0.1:8050/
  * Serving Flask app 'dashboard'
  * Debug mode: on
  ```
+
+8. In a seventh terminal start `sqlite-web`
+
+`sqlite_web -p 8191 -x -r -T ./shared.db`
+
+9. In an eight terminal start Solace Agent Mesh
+
+To build and start the Solace Agent Mesh service, run `sam run -b`. See appendix SAM for installation verification and configuration.
+
+Go to the interface (http://localhost:5001/) and ask the following questions, 1-3 are for verficiation.
+
+0.
+List all supported plugins with a detailed overview of the functionality they provide.
+
+1.
+How many plants does Cleanpulse company has?
+
+2.
+Create a table summarizing number of machine per building per plant for company Cleanpulse. 
+
+3.
+What is the total number of machines at Cleanpulse company.
+
+4.
+CURL
+Based on analysis of a combined ranking of the metrics for the levels of dust, sticky stuff and odor at the machines, using the representing values in columns sri, dli and odi, determine top 3 of machines for all buildings and plants that need to be stopped for cleaning maintenance and create a curl POST request command to send the machine ids, and the estimated number of minutes the cleaning will take in json format to http://localhost:54322/ Provide the complete curl command as response.
+
+POST
+Based on analysis of a combined ranking of the metrics for the levels of dust, sticky stuff and odor at the machines, using the representing values in columns sri, dli and odi, determine top 3 of machines for all buildings and plants that need to be stopped for cleaning maintenance and create a POST request command to send the machine ids, and the estimated number of minutes the cleaning will take in json format to http://localhost:54322/ Do send the command and also provide the used command as response.
+
+GET
+Based on analysis of a combined ranking of the metrics for the levels of dust, sticky stuff and odor at the machines, using the representing values in columns sri, dli and odi, determine top 3 of machines for all buildings and plants that need to be stopped for cleaning maintenance and create a GET request command to send the machine ids, and the estimated number of minutes the cleaning will take as a url query string to http://localhost:54322/ Send the request and in the response provide the used request.
+
+The cleanpulse company now is AI enabled. The AI agent determines Top 3 of machines that need to be cleaned and predicts number of minutes needed, so you can calculate impact on production/revenue.
+Use the analysis to predict which machines are likely to have the highest need for cleaning maintenance resources taking costs for energy, detergent, labour and revenue loss due to production impact into account.
+Return this predictive maintenance schedule as a nicely styled reported written for plant managers including an schedule for cleaning for the coming week for machine operators.
+
+5.
+Create an overall audit report of TODO
+Use template TODO
 
 ## Subscribing
 Client applications you can use to subscribe to the topic or queue on the broker (see `config.json` for name) to display and/or consume the published messages:
@@ -352,7 +242,7 @@ Using the SDKPerf for Java & JMS, for more information on SDKPerf see https://do
 
 ```
 export SDKPERF_BASE=~/sdkperf/sdkperf-jcsmp-8.4.17.5
-$SDKPERF_BASE/sdkperf_java.sh -cip=$SOLACE_TCP_PROTOCOL$SOLACE_HOST:$SOLACE_SMF_PORT -cu=$SOLACE_CLIENT_USER@$SOLACE_MESSAGE_VPN -cp=$SOLACE_CLIENT_PASS -sql='CUSTOM-QNAME-dummython' -md
+$SDKPERF_BASE/sdkperf_java.sh -cip=$SOLACE_TCP_PROTOCOL$SOLACE_HOST:$SOLACE_SMF_PORT -cu=$SOLACE_CLIENT_USER@$SOLACE_MESSAGE_VPN -cp=$SOLACE_CLIENT_PASS -sql='CUSTOM-QNAME-cleanpulse' -md
 ```
 
 For Try Me! and MQTTX see folder `./images` for related screenshots.
@@ -366,8 +256,8 @@ To configure the Solace PubSub+ Cloud broker service run `python3 ez_broker_conf
 Error message as below indicates something is wrong with port value and `http` protocol setting.
 
 ```
-Queue 'CUSTOM-QNAME-dummython' does not exist. Creating...
-Failed to create queue 'CUSTOM-QNAME-dummython': <html>
+Queue 'CUSTOM-QNAME-cleanpulse' does not exist. Creating...
+Failed to create queue 'CUSTOM-QNAME-cleanpulse': <html>
 <head><title>400 The plain HTTP request was sent to HTTPS port</title></head>
 <body>
 <center><h1>400 Bad Request</h1></center>
@@ -406,18 +296,18 @@ https://www.planttext.com/
 participant "Sender" as Sender
 participant "Gateway" as Gateway
 participant "Solace Broker" as Broker
-participant "CUSTOM-QNAME-dummython Queue" as Queue
+participant "CUSTOM-QNAME-cleanpulse Queue" as Queue
 participant "Solace Try Me!" as Consumer1
 participant "MQTT Consumer" as Consumer2
 participant "Custom Microservice" as Consumer3
 
 Sender -> Gateway: Send ebMS SOAP Message
 Gateway -> Gateway: Extract machine-id & Convert to JSON
-Gateway -> Broker: Publish JSON to topix "dummython/messages" (SMF Protocol)
-Broker -> Queue: CUSTOM-QNAME-dummython attracts messages with subscription to "dummython/messages"
-Queue -> Consumer1: Solace Try Me! consumes message from queue "CUSTOM-QNAME-dummython"
-Queue -> Consumer2: MQTT Consumer consumes message from queue "CUSTOM-QNAME-dummython"
-Queue -> Consumer3: A custom microservice consumes message from queue "CUSTOM-QNAME-dummython"
+Gateway -> Broker: Publish JSON to topix "cleanpulse/messages" (SMF Protocol)
+Broker -> Queue: CUSTOM-QNAME-cleanpulse attracts messages with subscription to "cleanpulse/messages"
+Queue -> Consumer1: Solace Try Me! consumes message from queue "CUSTOM-QNAME-cleanpulse"
+Queue -> Consumer2: MQTT Consumer consumes message from queue "CUSTOM-QNAME-cleanpulse"
+Queue -> Consumer3: A custom microservice consumes message from queue "CUSTOM-QNAME-cleanpulse"
 
 Gateway -> Sender: Acknowledge SOAP Response (200 OK)
 @enduml
@@ -491,6 +381,11 @@ https://docs.solace.com/API/Connectors/Self-Contained-Connectors/Message-Process
 2.
 Observability Log fowarding, Insights monitoring, Distributed Tracing OpenTelemetry
 
+## Todo
+
+* Add using a template for report creation.
+* Same for ticket creation, could show how it sends out (dummy) requests a JIRA or similar based on the analytics, and to process engineer using mobile MQTT client https://mymqtt.app/en or https://www.easymqtt.app/
+
 ## Appendices
 
 ### Appendix colima
@@ -545,13 +440,16 @@ List all containers with `docker ps -a`. To remove a container use `docker rm -f
 ```
 docker ps -a
 CONTAINER ID   IMAGE                           COMMAND               CREATED          STATUS          PORTS          NAMES
-a3663a4e4cd3   solace/solace-pubsub-standard   "/usr/sbin/boot.sh"   16 minutes ago   Up 16 minutes   0.0.0.0:1883->1883/tcp, :::1883->1883/tcp, 0.0.0.0:2222->2222/tcp, :::2222->2222/tcp, 0.0.0.0:5672->5672/tcp, :::5672->5672/tcp, 0.0.0.0:8000->8000/tcp, :::8000->8000/tcp, 0.0.0.0:8008->8008/tcp, :::8008->8008/tcp, 0.0.0.0:8080->8080/tcp, :::8080->8080/tcp, 0.0.0.0:9000->9000/tcp, :::9000->9000/tcp, 0.0.0.0:55554->55555/tcp, [::]:55554->55555/tcp   dummython
+a3663a4e4cd3   solace/solace-pubsub-standard   "/usr/sbin/boot.sh"   16 minutes ago   Up 16 minutes   0.0.0.0:1883->1883/tcp, :::1883->1883/tcp, 0.0.0.0:2222->2222/tcp, :::2222->2222/tcp, 0.0.0.0:5672->5672/tcp, :::5672->5672/tcp, 0.0.0.0:8000->8000/tcp, :::8000->8000/tcp, 0.0.0.0:8008->8008/tcp, :::8008->8008/tcp, 0.0.0.0:8080->8080/tcp, :::8080->8080/tcp, 0.0.0.0:9000->9000/tcp, :::9000->9000/tcp, 0.0.0.0:55554->55555/tcp, [::]:55554->55555/tcp   cleanpulse
 ```
 
 ### Appendix Neo4j
+
+Install Neo4j using `brew install neo4j`, this icnludes `cypher-shell` cli for neo4j and `openjdk@21`, see Appendix Neo4j.
+
 To get a services overview use `brew services list`. Depending on services installed and their status it will show something like:
 
-```bash
+```sh
 Name              Status  User       File
 dbus              none               
 docker-machine    none    emilzegers 
@@ -693,144 +591,103 @@ Build completed.
 Running Solace Agent Mesh application
 Starting Solace AI Event Connector
 Creating app agent_energy_usage_info
-Invalid 'config_parameters' in app_schema for app 'agent_energy_usage_info' (must be a list). Skipping validation.
-Creating flow energy_usage_info_action_request_processor in app agent_energy_usage_info
-[action_request_processor] [solace_ai_connector.energy_usage_info_action_request_processor.action_request_processor]  Using deprecated component-level 'broker_request_response' config. Consider migrating to app-level 'request_reply_enabled' in the 'broker' config.
-Invalid 'config_parameters' in app_schema for app '_internal_broker_request_response_app' (must be a list). Skipping validation.
-Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
-[action_request_processor] [solace_ai_connector.energy_usage_info_action_request_processor.action_request_processor]  Initialized component-level RequestResponseFlowController.
-Creating app monitor_stim_and_errors_to_slack
-Invalid 'config_parameters' in app_schema for app 'monitor_stim_and_errors_to_slack' (must be a list). Skipping validation.
-Creating flow event_monitor in app monitor_stim_and_errors_to_slack
-Creating flow slack_notification in app monitor_stim_and_errors_to_slack
-Creating app conversation_to_file
-Invalid 'config_parameters' in app_schema for app 'conversation_to_file' (must be a list). Skipping validation.
-Creating flow write_to_file in app conversation_to_file
-Creating app visualize_websocket
-Invalid 'config_parameters' in app_schema for app 'visualize_websocket' (must be a list). Skipping validation.
-Creating flow visualize_websocket in app visualize_websocket
-Creating app error_catcher
-Invalid 'config_parameters' in app_schema for app 'error_catcher' (must be a list). Skipping validation.
-Creating flow error-catcher-flow in app error_catcher
-Creating app agent_web_request
-Invalid 'config_parameters' in app_schema for app 'agent_web_request' (must be a list). Skipping validation.
-Creating flow action_request_processor in app agent_web_request
-[action_request_processor] [solace_ai_connector.action_request_processor.action_request_processor]  Using deprecated component-level 'broker_request_response' config. Consider migrating to app-level 'request_reply_enabled' in the 'broker' config.
-Invalid 'config_parameters' in app_schema for app '_internal_broker_request_response_app' (must be a list). Skipping validation.
-Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
-[action_request_processor] [solace_ai_connector.action_request_processor.action_request_processor]  Initialized component-level RequestResponseFlowController.
-[action_request_processor] [solace_ai_connector.action_request_processor.action_request_processor]  Using deprecated component-level 'broker_request_response' config. Consider migrating to app-level 'request_reply_enabled' in the 'broker' config.
-Invalid 'config_parameters' in app_schema for app '_internal_broker_request_response_app' (must be a list). Skipping validation.
-Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
-[action_request_processor] [solace_ai_connector.action_request_processor.action_request_processor]  Initialized component-level RequestResponseFlowController.
-[action_request_processor] [solace_ai_connector.action_request_processor.action_request_processor]  Using deprecated component-level 'broker_request_response' config. Consider migrating to app-level 'request_reply_enabled' in the 'broker' config.
-Invalid 'config_parameters' in app_schema for app '_internal_broker_request_response_app' (must be a list). Skipping validation.
-Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
-[action_request_processor] [solace_ai_connector.action_request_processor.action_request_processor]  Initialized component-level RequestResponseFlowController.
-[action_request_processor] [solace_ai_connector.action_request_processor.action_request_processor]  Using deprecated component-level 'broker_request_response' config. Consider migrating to app-level 'request_reply_enabled' in the 'broker' config.
-Invalid 'config_parameters' in app_schema for app '_internal_broker_request_response_app' (must be a list). Skipping validation.
-Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
-[action_request_processor] [solace_ai_connector.action_request_processor.action_request_processor]  Initialized component-level RequestResponseFlowController.
-[action_request_processor] [solace_ai_connector.action_request_processor.action_request_processor]  Using deprecated component-level 'broker_request_response' config. Consider migrating to app-level 'request_reply_enabled' in the 'broker' config.
-Invalid 'config_parameters' in app_schema for app '_internal_broker_request_response_app' (must be a list). Skipping validation.
-Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
-[action_request_processor] [solace_ai_connector.action_request_processor.action_request_processor]  Initialized component-level RequestResponseFlowController.
-[action_request_processor] [solace_ai_connector.action_request_processor.action_request_processor]  Using deprecated component-level 'broker_request_response' config. Consider migrating to app-level 'request_reply_enabled' in the 'broker' config.
-Invalid 'config_parameters' in app_schema for app '_internal_broker_request_response_app' (must be a list). Skipping validation.
-Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
-[action_request_processor] [solace_ai_connector.action_request_processor.action_request_processor]  Initialized component-level RequestResponseFlowController.
-[action_request_processor] [solace_ai_connector.action_request_processor.action_request_processor]  Using deprecated component-level 'broker_request_response' config. Consider migrating to app-level 'request_reply_enabled' in the 'broker' config.
-Invalid 'config_parameters' in app_schema for app '_internal_broker_request_response_app' (must be a list). Skipping validation.
-Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
-[action_request_processor] [solace_ai_connector.action_request_processor.action_request_processor]  Initialized component-level RequestResponseFlowController.
-[action_request_processor] [solace_ai_connector.action_request_processor.action_request_processor]  Using deprecated component-level 'broker_request_response' config. Consider migrating to app-level 'request_reply_enabled' in the 'broker' config.
-Invalid 'config_parameters' in app_schema for app '_internal_broker_request_response_app' (must be a list). Skipping validation.
-Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
-[action_request_processor] [solace_ai_connector.action_request_processor.action_request_processor]  Initialized component-level RequestResponseFlowController.
-[action_request_processor] [solace_ai_connector.action_request_processor.action_request_processor]  Using deprecated component-level 'broker_request_response' config. Consider migrating to app-level 'request_reply_enabled' in the 'broker' config.
-Invalid 'config_parameters' in app_schema for app '_internal_broker_request_response_app' (must be a list). Skipping validation.
-Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
-[action_request_processor] [solace_ai_connector.action_request_processor.action_request_processor]  Initialized component-level RequestResponseFlowController.
-[action_request_processor] [solace_ai_connector.action_request_processor.action_request_processor]  Using deprecated component-level 'broker_request_response' config. Consider migrating to app-level 'request_reply_enabled' in the 'broker' config.
-Invalid 'config_parameters' in app_schema for app '_internal_broker_request_response_app' (must be a list). Skipping validation.
-Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
-[action_request_processor] [solace_ai_connector.action_request_processor.action_request_processor]  Initialized component-level RequestResponseFlowController.
-Creating app monitor_user_feedback
-Invalid 'config_parameters' in app_schema for app 'monitor_user_feedback' (must be a list). Skipping validation.
-Creating flow feedback_monitor in app monitor_user_feedback
-Creating app orchestrator
-Invalid 'config_parameters' in app_schema for app 'orchestrator' (must be a list). Skipping validation.
-Creating flow orchestrator_register in app orchestrator
-Creating flow orchestrator_stimulus_input in app orchestrator
-[orchestrator_stimulus_processor] [solace_ai_connector.orchestrator_stimulus_input.orchestrator_stimulus_processor]  Using deprecated component-level 'broker_request_response' config. Consider migrating to app-level 'request_reply_enabled' in the 'broker' config.
-Invalid 'config_parameters' in app_schema for app '_internal_broker_request_response_app' (must be a list). Skipping validation.
-Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
-[orchestrator_stimulus_processor] [solace_ai_connector.orchestrator_stimulus_input.orchestrator_stimulus_processor]  Initialized component-level RequestResponseFlowController.
-[orchestrator_stimulus_processor] [solace_ai_connector.orchestrator_stimulus_input.orchestrator_stimulus_processor]  Using deprecated component-level 'broker_request_response' config. Consider migrating to app-level 'request_reply_enabled' in the 'broker' config.
-Invalid 'config_parameters' in app_schema for app '_internal_broker_request_response_app' (must be a list). Skipping validation.
-Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
-[orchestrator_stimulus_processor] [solace_ai_connector.orchestrator_stimulus_input.orchestrator_stimulus_processor]  Initialized component-level RequestResponseFlowController.
-[orchestrator_stimulus_processor] [solace_ai_connector.orchestrator_stimulus_input.orchestrator_stimulus_processor]  Using deprecated component-level 'broker_request_response' config. Consider migrating to app-level 'request_reply_enabled' in the 'broker' config.
-Invalid 'config_parameters' in app_schema for app '_internal_broker_request_response_app' (must be a list). Skipping validation.
-Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
-[orchestrator_stimulus_processor] [solace_ai_connector.orchestrator_stimulus_input.orchestrator_stimulus_processor]  Initialized component-level RequestResponseFlowController.
-[orchestrator_stimulus_processor] [solace_ai_connector.orchestrator_stimulus_input.orchestrator_stimulus_processor]  Using deprecated component-level 'broker_request_response' config. Consider migrating to app-level 'request_reply_enabled' in the 'broker' config.
-Invalid 'config_parameters' in app_schema for app '_internal_broker_request_response_app' (must be a list). Skipping validation.
-Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
-[orchestrator_stimulus_processor] [solace_ai_connector.orchestrator_stimulus_input.orchestrator_stimulus_processor]  Initialized component-level RequestResponseFlowController.
-[orchestrator_stimulus_processor] [solace_ai_connector.orchestrator_stimulus_input.orchestrator_stimulus_processor]  Using deprecated component-level 'broker_request_response' config. Consider migrating to app-level 'request_reply_enabled' in the 'broker' config.
-Invalid 'config_parameters' in app_schema for app '_internal_broker_request_response_app' (must be a list). Skipping validation.
-Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
-[orchestrator_stimulus_processor] [solace_ai_connector.orchestrator_stimulus_input.orchestrator_stimulus_processor]  Initialized component-level RequestResponseFlowController.
-Creating flow orchestrator_action_response in app orchestrator
-Creating flow streaming_output in app orchestrator
-Creating flow action_manager_timer in app orchestrator
-Creating app gateway_rest_api_rest_api
-Invalid 'config_parameters' in app_schema for app 'gateway_rest_api_rest_api' (must be a list). Skipping validation.
-Creating flow web_ui in app gateway_rest_api_rest_api
-Creating flow rest_gateway_input_flow in app gateway_rest_api_rest_api
-Creating flow rest_gateway_output_flow in app gateway_rest_api_rest_api
-Creating app agent_global
-Invalid 'config_parameters' in app_schema for app 'agent_global' (must be a list). Skipping validation.
-Creating flow global_agent_action_request_processor in app agent_global
-[action_request_processor] [solace_ai_connector.global_agent_action_request_processor.action_request_processor]  Using deprecated component-level 'broker_request_response' config. Consider migrating to app-level 'request_reply_enabled' in the 'broker' config.
-Invalid 'config_parameters' in app_schema for app '_internal_broker_request_response_app' (must be a list). Skipping validation.
-Creating flow _internal_broker_request_response_flow in app _internal_broker_request_response_app
-[action_request_processor] [solace_ai_connector.global_agent_action_request_processor.action_request_processor]  Initialized component-level RequestResponseFlowController.
-Creating app service_llm
-Invalid 'config_parameters' in app_schema for app 'service_llm' (must be a list). Skipping validation.
-Creating flow llm-service-planning in app service_llm
-Exception in thread Thread-108 (run_server):
-Traceback (most recent call last):
-  File "/opt/homebrew/Cellar/python@3.13/3.13.3_1/Frameworks/Python.framework/Versions/3.13/lib/python3.13/threading.py", line 1041, in _bootstrap_inner
-    self.run()
-    ~~~~~~~~^^
-  File "/opt/homebrew/Cellar/python@3.13/3.13.3_1/Frameworks/Python.framework/Versions/3.13/lib/python3.13/threading.py", line 992, in run
-    self._target(*self._args, **self._kwargs)
-    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/emilzegers/.venv/lib/python3.13/site-packages/solace_ai_connector/components/inputs_outputs/websocket_base.py", line 112, in run_server
-    self.http_server.serve_forever()
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
-  File "/Users/emilzegers/.venv/lib/python3.13/site-packages/gevent/baseserver.py", line 398, in serve_forever
-    self.start()
-    ~~~~~~~~~~^^
-  File "/Users/emilzegers/.venv/lib/python3.13/site-packages/gevent/baseserver.py", line 336, in start
-    self.init_socket()
-    ~~~~~~~~~~~~~~~~^^
-  File "/Users/emilzegers/.venv/lib/python3.13/site-packages/gevent/pywsgi.py", line 1672, in init_socket
-    StreamServer.init_socket(self)
-    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
-  File "/Users/emilzegers/.venv/lib/python3.13/site-packages/gevent/server.py", line 173, in init_socket
-    self.socket = self.get_listener(self.address, self.backlog, self.family)
-                  ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/emilzegers/.venv/lib/python3.13/site-packages/gevent/server.py", line 185, in get_listener
-    return _tcp_listener(address, backlog=backlog, reuse_addr=cls.reuse_addr, family=family)
-  File "/Users/emilzegers/.venv/lib/python3.13/site-packages/gevent/server.py", line 264, in _tcp_listener
-    sock.bind(address)
-    ~~~~~~~~~^^^^^^^^^
-  File "/Users/emilzegers/.venv/lib/python3.13/site-packages/gevent/_socketcommon.py", line 543, in bind
-    return self._sock.bind(address)
-           ~~~~~~~~~~~~~~~^^^^^^^^^
-OSError: [Errno 48] Address already in use: ('0.0.0.0', 5000)
+.
+.
+.
 Solace AI Event Connector started successfully
 ```
+
+### Solace Agent Mesh - SAM
+
+Ensure you are in the Solace Agent Mesh folder in the repo `cd ezsam`.
+
+Now add the required plugin(s) to your SAM project.
+
+#### SQL Database plugin
+
+See https://solacelabs.github.io/solace-agent-mesh/docs/documentation/tutorials/sql-database/
+
+```sh
+solace-agent-mesh plugin add sam_sql_database --pip -u git+https://github.com/SolaceLabs/solace-agent-mesh-core-plugins#subdirectory=sam-sql-database
+
+Module 'sam_sql_database' not found. Attempting to install 'git+https://github.com/SolaceLabs/solace-agent-mesh-core-plugins#subdirectory=sam-sql-database' using pip...
+.
+.
+.
+Successfully added plugin 'sam_sql_database'.
+```
+
+Then create an agent instance based on the SQL database template:
+
+```sh
+sam add agent energy_usage_info --copy-from sam_sql_database:sql_database
+
+Copied agent 'energy_usage_info' from plugin 'sam_sql_database' at: ./configs/agents
+```
+
+The SQL Database agent requires that you configure several environment variables. You must create or update your `.env` file with the following variables for this tutorial:
+
+```sh
+ENERGY_USAGE_INFO_DB_TYPE=sqlite
+ENERGY_USAGE_INFO_DB_NAME=../shared.db
+ENERGY_USAGE_INFO_DB_PURPOSE="Cleanpulse operations and cleaning database"
+ENERGY_USAGE_INFO_DB_DESCRIPTION="Contains information about Cleanpulse machine operations and cleaning requirements and metrics for multiple buildings at various plants."
+ENERGY_USAGE_INFOSQL_DB_PORT=
+ENERGY_USAGE_INFO_DB_HOST=
+ENERGY_USAGE_INFO_DB_PASSWORD=
+ENERGY_USAGE_INFO_DB_USER=
+```
+
+#### Graph Database plugin
+
+```sh
+solace-agent-mesh plugin add sam_graph_database --pip -u git+https://github.com/taatuut/solace-agent-mesh-core-plugins#subdirectory=sam-graph-database
+
+Module 'sam_graph_database' not found. Attempting to install 'git+https://github.com/taatuut/solace-agent-mesh-core-plugins#subdirectory=sam-graph-database' using pip...
+.
+.
+.
+Successfully added plugin 'sam_graph_database'.
+```
+
+Then create an agent instance based on the Graph database template:
+
+```sh
+sam add agent cleaning_metrics_info --copy-from sam_graph_database:graph_database
+
+Copied agent 'cleaning_metrics_info' from plugin 'sam_graph_database' at: ./configs/agents
+```
+
+The Graph Database agent requires that you configure several environment variables. You must create or update your `.env` file with the following variables for this tutorial:
+
+```sh
+CLEANING_METRICS_INFOSQL_DB_PORT=
+CLEANING_METRICS_INFO_DB_DESCRIPTION=
+CLEANING_METRICS_INFO_DB_HOST=
+CLEANING_METRICS_INFO_DB_NAME=
+CLEANING_METRICS_INFO_DB_PASSWORD=
+CLEANING_METRICS_INFO_DB_PURPOSE=
+CLEANING_METRICS_INFO_DB_TYPE=
+CLEANING_METRICS_INFO_DB_USER=
+```
+
+To remove a plugin:
+
+```sh
+sam plugin remove sam_graph_database
+python3 -m pip uninstall sam_graph_database
+```
+
+Onelliner to reinstall:
+
+`% clear && printf '\n%.0s' {1..50} && sam plugin remove sam_graph_database && python3 -m pip uninstall -y sam_graph_database && solace-agent-mesh plugin add sam_graph_database --pip -u git+https://github.com/taatuut/solace-agent-mesh-core-plugins#subdirectory=sam-graph-database && sam add agent cleaning_metrics_info --copy-from sam_graph_database:graph_database && sam run -b`
+
+### Appendix Concept
+- create application description and use ai event model wizard to create app with events
+- follow outline at https://feeds.solace.dev/ to create feed
+- create feed(s) would be nice if these are semirandom so we cabn use ai to detect patterns in there, check if this is possible with feed
+- create event broker services, event mesh
+- publish data streams and/or feeds to event broker services, event mesh
+- add ai agent as subscriber to detect patterns (like 'cleaning at night/weekend is cheaper because of energy cost', 'cleaning on friday uses way more chemicals because too long cleaning interval following Sun-Tue-Fri scheudle', just making these up) 
+- publish or subscribe a analytics / dashboard
+

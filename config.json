@@ -1,32 +1,38 @@
 {
     "app": {
-        "name": "dummython",
+        "name": "cleanpulse",
         "url": "http://localhost:54321",
-        "dummy_url": "http://example.com/dummython-endpoint",
+        "dummy_url": "http://example.com/cleanpulse-endpoint",
         "queues": [
             {
-            "name": "CUSTOM-QNAME-dummython-json",
+            "name": "CUSTOM-QNAME-cleanpulse-json",
             "subscriptions": [
-                "dummython/messages/json/>",
+                "cleanpulse/messages/json/>",
                 "test/some/value"
             ]
             },
             {
             "name": "CUSTOM-QNAME-neo4j-json",
             "subscriptions": [
-                "dummython/messages/json/>"
+                "cleanpulse/messages/json/>"
             ]
             },
             {
             "name": "CUSTOM-QNAME-sqlite-json",
             "subscriptions": [
-                "dummython/messages/json/>"
+                "cleanpulse/messages/json/>"
             ]
             },
             {
-            "name": "CUSTOM-QNAME-dummython-xml",
+            "name": "CUSTOM-QNAME-notifications",
             "subscriptions": [
-                "dummython/messages/xml/>",
+                "cleanpulse/notifications/>"
+            ]
+            },
+            {
+            "name": "CUSTOM-QNAME-cleanpulse-xml",
+            "subscriptions": [
+                "cleanpulse/messages/xml/>",
                 "test/another/value"
             ]
             },
@@ -37,7 +43,7 @@
             ]
             }
         ],
-        "topic": "dummython/messages",
+        "topic": "cleanpulse/messages",
         "debug": true,
         "log_level": "info",
         "report_file": "output/report.txt"

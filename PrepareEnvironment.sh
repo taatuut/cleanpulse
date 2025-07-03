@@ -13,16 +13,25 @@ source .env
 #printenv
 
 ### Clean out Solace ###
-
-# TODO: remove all created queues, or just remove and restart docker container
+# Remove all created queues and broker configuration, easy way now is removing docker container and start and configure new container
 echo "Remove Solace event broker docker container $SOLACE_NAME"
 docker rm -f $SOLACE_NAME
 echo "Create Solace event broker docker container $SOLACE_NAME"
 # NOTE: chaining commands on success, not sure if this waits until broker is up and accessible... Otherwise use sleep
-docker run -d -p 8080:8080 -p 55554:55555 -p 8008:8008 -p 1883:1883 -p 8000:8000 -p 5672:5672 -p 9000:9000 -p 2222:2222 --shm-size=2g --env username_admin_globalaccesslevel=$SOLACE_USER --env username_admin_password=$SOLACE_PASS --name=$SOLACE_NAME solace/solace-pubsub-standard
+docker run -d -p 8080:8080 -p 55554:55555 -p 8008:8008 -p 1883:1883 -p 8000:8000 -p 5550:5550 -p 5672:5672 -p 9000:9000 -p 2222:2222 --shm-size=2g --env username_admin_globalaccesslevel=$SOLACE_USER --env username_admin_password=$SOLACE_PASS --name=$SOLACE_NAME solace/solace-pubsub-standard
 echo "Configure Solace event broker"
-#todo: must use check like while not responsive sleep 1
-sleep 10 #
+sleepytime=1
+max_retries=30
+count=0
+until [[ "$(curl -s -o /dev/null -w ''%{http_code}'' http://localhost:5550/health-check/guaranteed-active)" == "200" ]]; do
+  ((count++))
+  if (( count >= max_retries )); then
+    echo "Service did not become ready after $max_retries seconds. Exiting."
+    exit 1
+  fi
+  echo "Waiting for service to be ready... ($count)"
+  sleep $sleepytime
+done
 python3 ez_broker_configuration.py
 
 ### Clean out MongoDB ###

@@ -148,7 +148,7 @@ def main():
 def run_loop():
     while True:
         main()
-        time.sleep(5)  # Optional interval between messages
+        time.sleep(5)  # Interval between messages
 
 def run_http_server():
     try:

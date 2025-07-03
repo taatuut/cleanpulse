@@ -16,11 +16,11 @@ from sklearn.preprocessing import StandardScaler
 # ez
 from ez_config_loader import ConfigLoader
 
-def initialize_db():
+def initialize_db(db_name):
     """Initialize the sqlite database and create a transactions table."""
-    # Use a file based database to be able to access for read and writeb from multiple processes (Python scripts)
+    # Use a file based database not memory to be able to access for read and writeb from multiple processes (Python scripts)
     #conn = sqlite3.connect(':memory:', check_same_thread=False)
-    conn = sqlite3.connect('shared.db', check_same_thread=False) # TODO: get db name from app config
+    conn = sqlite3.connect(db_name, check_same_thread=False)
     cursor = conn.cursor()
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS transactions (
@@ -199,10 +199,12 @@ if __name__ == "__main__":
 
     REPORT_FILE = config.get("app.report_file")
 
+    SQLITE_DB_NAME = os.environ["SQLITE_DB_NAME"]
+
     # Initialize SQLite database (would be Neo4j, MongoDB Atlas, bank system, combination...)
     try:
-        conn = initialize_db()
-        tprint("- SQLite database running")
+        conn = initialize_db(SQLITE_DB_NAME)
+        tprint("- SQLite database running, SQLite Web browser at  at http://localhost:8191")
     except Exception as e:
         tprint(f"- SQLite database not running: {e}")
         quit()
@@ -247,8 +249,8 @@ if __name__ == "__main__":
             self.processor_func(message)
 
     try:
-        # Create queue receiver
-        QUEUE_NAME = 'CUSTOM-QNAME-sqlite-json' # TODO: get from config
+        # Create queue receiver using hardcoded queue name from config.json
+        QUEUE_NAME = 'CUSTOM-QNAME-sqlite-json'
         queue = Queue.durable_exclusive_queue(QUEUE_NAME) 
         receiver = messaging_service.create_persistent_message_receiver_builder().build(queue)
         receiver.start()

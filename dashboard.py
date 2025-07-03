@@ -1,4 +1,5 @@
 import json
+import os
 import sqlite3
 import pandas as pd
 from dash import Dash, dcc, html
@@ -53,5 +54,8 @@ def update_dashboard(n):
     return metrics, fig_line, fig_plant, fig_building, fig_machine
 
 if __name__ == '__main__':
-    conn = sqlite3.connect('shared.db', check_same_thread=False) # TODO: get db name from app config
+    # NOTE: environment variables must be sourced in advance
+    SQLITE_DB_NAME = os.environ["SQLITE_DB_NAME"]
+    # Create connection
+    conn = sqlite3.connect(SQLITE_DB_NAME, check_same_thread=False)
     app.run(debug=True)

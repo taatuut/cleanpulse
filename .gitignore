@@ -181,3 +181,4 @@ output/report.txt
 shared.db
 ezsam/trace_None_default.txt
 ezsam/trace_None_None.txt
+documents/*.docx
